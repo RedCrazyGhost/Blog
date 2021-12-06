@@ -22,10 +22,17 @@ var app = new Vue({
             style.href = 'CSS/github.css';
         }
         head.appendChild(style);
+        
+        let _this=this
+        axios.get("MarkDown/Blog.json").then(function(response){
+            _this.Blogs=response.data;
+        }).catch(function (error){
+            console.log(error);
+        })
     },
     data() {
         return {
-            Blogs: ["Chat系统人员分工","11月安排规划-占文星"],
+            Blogs: [],
             targeMD: "Choose...",
             isWarning: false,
             AppColor:""

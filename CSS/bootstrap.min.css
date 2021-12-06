@@ -6,7 +6,32 @@
  * Copyright 2011-2021 Twitter, Inc.
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
  */
- .callout {
+ /**
+ * changer：redcrazyghost
+ */
+.pre-light{
+    background-color: #f6f8fa;
+}
+.pre-dark{
+    background-color: #2d333b;
+ }
+pre[class*='language-']{
+    padding: 2rem 1rem 0.5rem;
+    border-radius: 0.25rem;
+}
+pre[class*='language-']::before{
+    content: '';
+    position: absolute;
+    top: 9px;
+    left: 15px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #fc625d;
+    box-shadow: 20px 0 #fdbc40, 40px 0 #35cd4b;
+    z-index: 1;
+}
+.callout {
     padding: 1.25rem;
     margin-top: 1.25rem;
     margin-bottom: 1.25rem;
@@ -14,8 +39,11 @@
     border-left-width: 0.25rem;
     border-radius: 0.25rem;
  }
- .callout-info {
+.callout-info {
     border-left-color: #5bc0de;
+}
+.callout-wanring {
+    border-left-color: #f0ad4e;
 }
 :root {
     --bs-blue: #0d6efd;
@@ -270,6 +298,7 @@ samp {
 }
 
 pre {
+    position: relative;
     display: block;
     margin-top: 0;
     margin-bottom: 1rem;

@@ -34,7 +34,7 @@
                         <option selected>Choose...</option>
                         <option v-for="(i,k) in Blogs">{{i}}</option>
                     </select>
-                    <button v-on:click="getMarkDown" class="btn btn-outline-primary" type="button">Button</button>
+                    <button v-on:click="getMarkDown" :class="this.AppColor=='dark'? 'btn btn-outline-warning':'btn btn-outline-primary'" type="button">Button</button>
                 </div>
                 <div>
                     <div v-show="isWarning" class="text-danger">请选择正确的名称！</div>
