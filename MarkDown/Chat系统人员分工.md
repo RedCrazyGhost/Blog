@@ -28,7 +28,6 @@ flowchart TD
 
 ### Client端程序运行流程图（🤔考虑重构）
 ```mermaid
-%%{init: {'theme':'base'}}%%
 flowchart TD
 程序启动-->显示Home主页
 显示Home主页-->|1|注册用户-->注册用户名-->注册密码-->注册邮箱-.JSON.->Server-.JSON:Home失败.->显示Home主页
@@ -44,6 +43,41 @@ Server-.JSON:注册成功.->显示Home主页
 显示System主页-->|6|退出-.JSON.->Server-.JSON:下线成功.->显示Home主页
 ```
 
+### 聊天功能时序图
+```mermaid
+sequenceDiagram
+  autonumber
+  par 私聊流程 1-4
+    Client1->>+Server:Client2-你今天吃的什么？
+    Server-->>-Client2:Client1:你今天吃的什么？
+    Client2->>+Server:Client1-清真的牛肉拉面
+    Server-->>-Client1:Client2:清真的牛肉拉面
+  end
+  
+  par 群聊流程 5-16
+    Client3->>+Server:All-群里面有人吗？
+    Server-->>Client3:群聊:Client3:群里面有人吗？
+    Server-->>Client2:群聊:Client3:群里面有人吗？
+    Server-->>-Client1:群聊:Client3:群里面有人吗？
+    Client1->>+Server:All-我在群里啊！
+    Server-->>Client3:群聊:Client1:我在群里啊！
+    Server-->>Client2:群聊:Client1:我在群里啊！
+    Server-->>-Client1:群聊:Client1:我在群里啊！
+    Client2->>+Server:All-我也在群里啊！
+    Server-->>Client3:群聊:Client2:我也在群里啊！
+    Server-->>Client2:群聊:Client2:我也在群里啊！
+    Server-->>-Client1:群聊:Client2:我也在群里啊！
+  end
+
+  par 混合流程 18-22
+    Client3->>+Server:All-群里面有人吗？
+    Server-->>Client3:群聊:Client3:群里面有人吗？
+    Server-->>Client2:群聊:Client3:群里面有人吗？
+    Client2->>+Server:Client1-今天你打算去哪里玩？
+    Server-->>-Client1:Client2:今天你打算去哪里玩？
+    Server-->>-Client1:群聊:Client3:群里面有人吗？
+  end
+```
 
 ### 数据库
 #### 默认配置(YAML)

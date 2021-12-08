@@ -8387,9 +8387,9 @@ fieldset:disabled .btn {
 .bg-danger {
     background-color: #dc3545 !important
 }
-
+/* 修改为纯白背景 */
 .bg-light {
-    background-color: #f8f9fa !important
+    background-color: #fff !important
 }
 
 .bg-dark {
