@@ -2,6 +2,23 @@
 编写人：占文星
 更新时间：2021年12月14日
 
+```mermaid
+gantt
+    title Chat系统任务分配
+    dateFormat  YYYY-MM-DD
+    section 占文星
+    成员分工表 :work,2021-11-25,20d
+    Server   :Server,2021-11-25,10d
+    Server和Client联调整合 :after Server,10d
+    section 任涛
+    Client-HomeView :HomeView,2021-11-25,10d
+    Chat系统PPT :after HomeView,10d
+    section 袁宏业
+    Client-SystemView :SystemView,2021-11-25,10d
+    Chat系统实验报告 :after SystemView,10d
+```
+
+
 ## Chat系统项目截止日期：2021年12月15日
 
 ### 设计实验报告（3份）
@@ -57,48 +74,34 @@ Server-.->|JSON|Client
 sequenceDiagram
   autonumber
   par 私聊流程 1-4 
-    rect rgb(191, 223, 255)
     Client1->>+Server:Client2-你今天吃的什么？
     Server-->>-Client2:Client1:你今天吃的什么？
-    end
-    rect rgb(191, 223, 255)
     Client2->>+Server:Client1-清真的牛肉拉面
     Server-->>-Client1:Client2:清真的牛肉拉面
-    end
   end
   
   par 群聊流程 5-16
-    rect rgb(191, 223, 255)
     Client3->>+Server:All-群里面有人吗？
     Server-->>Client3:群聊:Client3:群里面有人吗？
     Server-->>Client2:群聊:Client3:群里面有人吗？
     Server-->>-Client1:群聊:Client3:群里面有人吗？
-    end
-    rect rgb(191, 223, 255)
     Client1->>+Server:All-我在群里啊！
     Server-->>Client3:群聊:Client1:我在群里啊！
     Server-->>Client2:群聊:Client1:我在群里啊！
     Server-->>-Client1:群聊:Client1:我在群里啊！
-    end
-    rect rgb(191, 223, 255)
     Client2->>+Server:All-我也在群里啊！
     Server-->>Client3:群聊:Client2:我也在群里啊！
     Server-->>Client2:群聊:Client2:我也在群里啊！
     Server-->>-Client1:群聊:Client2:我也在群里啊！
-    end
   end
 
   par 混合聊天流程 18-22
-    rect rgb(191, 223, 255)
     Client3->>+Server:All-群里面有人吗？
     Server-->>Client3:群聊:Client3:群里面有人吗？
     Server-->>Client2:群聊:Client3:群里面有人吗？
-    rect rgb(200, 150, 255)
     Client2->>+Server:Client1-今天你打算去哪里玩？
     Server-->>-Client1:Client2:今天你打算去哪里玩？
-    end
     Server-->>-Client1:群聊:Client3:群里面有人吗？
-    end
   end
 ```
 
@@ -126,23 +129,22 @@ database:
 
 | key | value | 说明 |
 |:-:|:-:|:-:|
-| PATH |Home-login/Clinet|路径 Client-View-Home-Login 取后2个名称 <span style="color:red">路径使用小写命名</span>|
-|TOKEN|<span style="color:red">(username)</span>|身份 无值传空 通过算法进行处理|
-|TO|username|发送用户名|
+| PATH |"Home-login/Clinet"|路径 Client-View-Home-Login 取后2个名称 <span style="color:red">路径使用小写命名</span>|
+|TOKEN|<span style="color:red"> "(username)" </span>|身份 无值传空 通过算法进行处理|
+|TO|"username"|发送用户名|
 |ENCODING|"GBK"|Client编码|
 
 #### body(携带参数)
 
 |key|value|
 |:-:|:-:|
-|request-username|testname|
-|request-password|test|
-|request-email|test@test.com|
+|request-username|"testname"|
+|request-password|"123456"|
+|request-email|"test@test.com"|
 |response-message|"操作成功！"|
 
 ### 源码（1份）分工如下
 #### 占文星
-截止完成日期：2021年12月5日
 
 |序号|完成情况|功能模块|模块名称|
 |:-:|:-:|:-:|:-:|
@@ -157,9 +159,7 @@ database:
 |9|✅|Server-Fucntion-DataBase-DataManage|服务端-功能-数据库-数据管理|
 |10|✅|Server-Fucntion-Log|服务端-功能-日志|
 
-
 #### 任涛
-截止完成日期：2021年12月5日
 
 |序号|完成情况|功能模块|模块名称|
 |:-:|:-:|:-:|:-:|
@@ -173,7 +173,6 @@ database:
 |8|✅|Client-Function-Home-Quit|客户端-首页-功能-系统退出|
 
 #### 袁宏业
-完成日期：2021年12月5日
 
 |序号|完成情况|功能模块|模块名称|
 |:-:|:-:|:-:|:-:|
