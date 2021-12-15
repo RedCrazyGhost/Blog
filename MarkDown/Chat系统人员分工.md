@@ -1,6 +1,6 @@
 # Chat系统人员分工
 编写人：占文星
-更新时间：2021年12月14日
+更新时间：2021年12月15日
 
 ```mermaid
 gantt
@@ -146,6 +146,22 @@ database:
 ### 源码（1份）分工如下
 #### 占文星
 
+```mermaid
+flowchart TD
+   subgraph Server
+      添加用户
+      查询用户
+      删除用户
+      修改用户
+      服务端通道
+      在线用户
+      私聊
+      群聊
+      数据库
+      日志
+   end
+```
+
 |序号|完成情况|功能模块|模块名称|
 |:-:|:-:|:-:|:-:|
 |1|✅|Server-Function-CreateUser|服务端-功能-添加用户|
@@ -161,6 +177,16 @@ database:
 
 #### 任涛
 
+```mermaid
+flowchart TD
+   subgraph Client-HomeView
+      用户注册
+      用户登录
+      找回密码
+      程序退出
+   end
+```
+
 |序号|完成情况|功能模块|模块名称|
 |:-:|:-:|:-:|:-:|
 |1|✅|Client-View-Home-Create|客户端-首页-显示-用户注册|
@@ -173,6 +199,18 @@ database:
 |8|✅|Client-Function-Home-Quit|客户端-首页-功能-系统退出|
 
 #### 袁宏业
+
+```mermaid
+flowchart TD
+   subgraph  Client-SystemView
+      查看在线人员
+      私聊
+      群聊
+      修改密码
+      账号注销
+      退出系统
+   end
+```
 
 |序号|完成情况|功能模块|模块名称|
 |:-:|:-:|:-:|:-:|
