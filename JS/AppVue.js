@@ -5,7 +5,7 @@ var app = new Vue({
             highlight:function(code, lang, callback) {
                 language=lang;
                 return hljs.highlight(code,{language}).value;
-              }
+            }
         })
         mermaid.initialize({startOnLoad:true});
     },
