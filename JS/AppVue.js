@@ -42,7 +42,7 @@ var app = new Vue({
     },
     data() {
         return {
-            targetURL:"https://cdn.jsdelivr.net/gh/RedCrazyGhost/CDN/",
+            targetURL:"https://cdn.jsdelivr.net/gh/RedCrazyGhost/CDN@last/",
             Blogs: [],
             targeMD: "Choose...",
             isWarning: false,
