@@ -24,14 +24,25 @@ var app = new Vue({
         head.appendChild(style);
         
         let _this=this
-        axios.get("MarkDown/Blog.json").then(function(response){
+
+        axios.get(this.targetURL+"MarkDown/Blog.json").then(function(response){
             _this.Blogs=response.data;
         }).catch(function (error){
             console.log(error);
+            if (this.targetURL!="") {
+                axios.get(_this.targetURL+"MarkDown/").then(function(response){
+                    regexp=/(?<=\.md\">).*?(?=\.md<\/a>)/gim
+                    _this.Blogs=response.data.match(regexp)
+                }).catch(function (error){
+                    console.log(error);
+                })
+            }
         })
+        
     },
     data() {
         return {
+            targetURL:"https://cdn.jsdelivr.net/gh/RedCrazyGhost/CDN/",
             Blogs: [],
             targeMD: "Choose...",
             isWarning: false,
@@ -41,7 +52,7 @@ var app = new Vue({
     methods: {
         getMarkDown() {
             if (this.targeMD !== "Choose...") {
-                axios.get("MarkDown/" + this.targeMD + ".md")
+                axios.get(this.targetURL+"MarkDown/" + this.targeMD + ".md")
                     .then(function (response) {
                         document.getElementById('markdown').innerHTML =  marked.parse(response.data);
                         mermaid.init();
