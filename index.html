@@ -19,8 +19,7 @@
 </head>
 
 <body style="font-family:HYCuYuanJ">
-    <div id="App" :class="'container-fluid bg-'+AppColor+' text-'+judgeColorChangeFontColor(AppColor)">
-
+    <div id="App" :class="'container-fluid bg-'+WebSiteConfig.AppColor+' text-'+judgeColorChangeFontColor(WebSiteConfig.AppColor)">
         <div class="row offset-1 col-10" style="padding-top: 2.5rem;">
             <div class="text-center">
                 <h1>
@@ -34,7 +33,7 @@
                         <option selected>Choose...</option>
                         <option v-for="(i,k) in Blogs">{{i}}</option>
                     </select>
-                    <button v-on:click="getMarkDown" :class="this.AppColor=='dark'? 'btn btn-outline-warning':'btn btn-outline-primary'" type="button">Button</button>
+                    <button v-on:click="getMarkDown" :class="this.WebSiteConfig.AppColor=='dark'? 'btn btn-outline-warning':'btn btn-outline-primary'" type="button">Button</button>
                 </div>
                 <div>
                     <div v-show="isWarning" class="text-danger">请选择正确的名称！</div>
@@ -46,6 +45,13 @@
                 </div>
             </div>
         </div>
+        <nav :class="'by-4 navbar navbar-'+WebSiteConfig.AppColor+' bg-'+WebSiteConfig.AppColor">
+            <div class="container">
+                <span class="navbar-text">2022 © {{WebSiteConfig.AppAuthor.name}}</span>
+                <a class="nav-link navbar-text" href="http://beian.miit.gov.cn/">鄂ICP备19031343号-1</a>
+                <span class="navbar-text">Web Site Version:{{WebSiteConfig.AppVersion}}</span>
+            </div>
+        </nav>
     </div>
 
 </body>

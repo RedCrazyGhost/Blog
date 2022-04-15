@@ -14,45 +14,50 @@ var app = new Vue({
         var style = document.createElement('link');
         style.rel = 'stylesheet';
         style.type = 'text/css';
+        console.log("test");
         if (new Date().getHours()>=18||new Date().getHours()<=6) {
-            this.AppColor="dark"
+            this.WebSiteConfig.AppColor="dark"
             style.href = 'CSS/github-dark.css';
         }else{
-            this.AppColor="ligth"
+            this.WebSiteConfig.AppColor="ligth"
             style.href = 'CSS/github.css';
         }
         head.appendChild(style);
         
         let _this=this
 
-        axios.get(this.targetURL+"MarkDown/Blog.json").then(function(response){
+        
+        axios.get("./Blog.json").then(function(response){
             _this.Blogs=response.data;
         }).catch(function (error){
-            console.log(error);
-            if (this.targetURL!="") {
-                axios.get(_this.targetURL+"MarkDown/").then(function(response){
-                    regexp=/(?<=\.md\">).*?(?=\.md<\/a>)/gim
-                    _this.Blogs=response.data.match(regexp)
-                }).catch(function (error){
-                    console.log(error);
-                })
-            }
+            axios.get(_this.CDNurl+"MarkDown/Blog.json").then(function(response){
+                _this.Blogs=response.data;
+            })
         })
+       
         
     },
     data() {
         return {
-            targetURL:"https://cdn.jsdelivr.net/gh/RedCrazyGhost/CDN@last/",
+            CDNurl:"https://cdn.jsdelivr.net/gh/RedCrazyGhost/CDN@last/",
             Blogs: [],
             targeMD: "Choose...",
             isWarning: false,
-            AppColor:""
+            WebSiteConfig: {
+                AppAuthor: {
+                    name: "RedCrazyGhost",
+                    src: "IMAG/Author.jpeg",
+                },
+                AppVersion: "0.0.1",
+                AppColor: "light",
+                AppFontFamily: "HYCuYuanJ"
+            },
         };
     },
     methods: {
         getMarkDown() {
             if (this.targeMD !== "Choose...") {
-                axios.get(this.targetURL+"MarkDown/" + this.targeMD + ".md")
+                axios.get("./MarkDown/" + this.targeMD + ".md")
                     .then(function (response) {
                         document.getElementById('markdown').innerHTML =  marked.parse(response.data);
                         mermaid.init();
