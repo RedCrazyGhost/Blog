@@ -40,23 +40,23 @@ public class QuestionA {
 这是一道结果填空的题，你只需要算出结果后提交即可。本题的结果为一
 个整数，在提交答案时只填写这个整数，填写多余的内容将无法得分。
 
-参考答案：120101
+参考答案：3139
 
 参考代码：
 ```java
 public class QuestionB {
     public void methode(){
         int sum=0;
-      top:  for (int i = 2022; i <2022222022 ; i++) {
+      top:  for (int i = 2022; i <= 2022222022 ; i++) {
             char[] chars=String.valueOf(i).toCharArray();
             for (int j = 0; j < chars.length/2; j++) {
-                if (chars[j]!=chars[chars.length-1-j]){
+                if (chars[j]!=chars[chars.length-1-j]||chars[j]>chars[j+1]){
                     continue top;
                 }
             }
             sum+=1;
         }
-//        sum= 120101
+//        sum= 3138
         System.out.println("[2022 , 2022222022] 中存在的回文数个数 ："+sum);
     }
 }

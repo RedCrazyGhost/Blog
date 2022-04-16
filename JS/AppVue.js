@@ -19,7 +19,7 @@ var app = new Vue({
             this.WebSiteConfig.AppColor="dark"
             style.href = 'CSS/github-dark.css';
         }else{
-            this.WebSiteConfig.AppColor="ligth"
+            this.WebSiteConfig.AppColor="light"
             style.href = 'CSS/github.css';
         }
         head.appendChild(style);
