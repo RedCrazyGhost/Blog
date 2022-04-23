@@ -1,6 +1,8 @@
 # Chat系统人员分工
-编写人：RedCrazyGhost
-更新时间：2021年12月15日
+> 作者 : RedCrazyGhost
+> 创建时间 : 2021-12-15
+> 修改时间 : 2022-04-23
+> 标签 : <span class="badge bg-secondary">Mac OS</span>  <span class="badge   bg-primary ">Java</span> 
 
 ```mermaid
 gantt

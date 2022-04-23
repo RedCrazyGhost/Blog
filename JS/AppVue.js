@@ -14,7 +14,6 @@ var app = new Vue({
         var style = document.createElement('link');
         style.rel = 'stylesheet';
         style.type = 'text/css';
-        console.log("test");
         if (new Date().getHours()>=18||new Date().getHours()<=6) {
             this.WebSiteConfig.AppColor="dark"
             style.href = 'CSS/github-dark.css';

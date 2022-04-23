@@ -1,4 +1,8 @@
-# SSM 配置
+# SSM框架配置
+> 作者 : RedCrazyGhost
+> 创建时间 : 2022-04-14
+> 修改时间 : 2022-04-23
+> 标签 :  <span class="badge bg-secondary">Mac OS</span> <span class="badge rounded-pill bg-success">Spring</span> <span class="badge rounded-pill bg-success">Spring MVC</span> <span class="badge rounded-pill bg-success">MyBatis</span> <span class="badge bg-primary">Java</span> 
 
 Maven POM.xml
 
@@ -16,17 +20,51 @@ Maven POM.xml
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
-        <springframework-version>5.3.18</springframework-version>
+        <springframework-version>5.2.21.RELEASE</springframework-version>
         <log4j-version>2.17.2</log4j-version>
         <druid-version>1.2.8</druid-version>
         <mysql-version>8.0.28</mysql-version>
         <mybatis-veriosn>3.5.9</mybatis-veriosn>
         <mybatis-spring-version>2.0.7</mybatis-spring-version>
         <lombok-version>1.18.22</lombok-version>
+        <aspectj-version>1.9.9.1</aspectj-version>
+        <cglib-version>3.3.0</cglib-version>
+        <junit-version>5.8.2</junit-version>
+        <fastjson-verions>1.2.80</fastjson-verions>
     </properties>
 
 
     <dependencies>
+
+        <!--alibaba json 解析-->
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>fastjson</artifactId>
+            <version>${fastjson-verions}</version>
+        </dependency>
+
+        <!--单元测试-->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>${junit-version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!--aop 代理-->
+        <dependency>
+            <groupId>cglib</groupId>
+            <artifactId>cglib</artifactId>
+            <version>${cglib-version}</version>
+        </dependency>
+
+        <!--aop 注解-->
+        <!--1.9.9.1 没有@Aspect-->
+        <dependency>
+            <groupId>org.aspectj</groupId>
+            <artifactId>aspectjweaver</artifactId>
+            <version>${aspectj-version}</version>
+        </dependency>
 
         <!--注解 自动生成常用方法-->
         <dependency>
@@ -89,6 +127,7 @@ Maven POM.xml
         </dependency>
 
     </dependencies>
+
 </project>
 ```
 
@@ -111,12 +150,18 @@ graph LR
 ```
 
 Webapp web.xml
-
+```mermaid
+graph LR
+subgraph 节点加载顺序
+   context-param --> listener --> filter --> servlet
+end
+```
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd"
+         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee
+                  http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd"
          version="4.0">
 
     <!--WEB 应用名称-->
@@ -141,7 +186,7 @@ Webapp web.xml
         <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
         <init-param>
             <param-name>contextConfigLocation</param-name>
-            <param-value>classpath:/spring-mvc.xml</param-value>
+            <param-value>classpath:spring-mvc.xml</param-value>
         </init-param>
         <load-on-startup>1</load-on-startup>
     </servlet>
@@ -149,6 +194,55 @@ Webapp web.xml
         <servlet-name>app</servlet-name>
         <url-pattern>/</url-pattern>
     </servlet-mapping>
+
+    <!--过滤器配置-->
+    <!--
+        修改 tomcat server.xml 配置 添加URIEncoding
+        <Connector port="8080" protocol="HTTP/1.1"
+               connectionTimeout="20000"
+               redirectPort="8443"
+               URIEncoding="UTF-8"
+               />
+        也无法生效！
+     -->
+    <filter>
+        <filter-name>encodingFilter</filter-name>
+        <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+        <init-param>
+            <param-name>encoding</param-name>
+            <param-value>UTF-8</param-value>
+        </init-param>
+        <init-param>
+            <param-name>forceEncoding</param-name>
+            <param-value>true</param-value>
+        </init-param>
+    </filter>
+    <filter-mapping>
+        <filter-name>encodingFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+    <!--会话设置-->
+    <session-config>
+        <cookie-config>
+            <name>MyConfig</name>
+            <!--cookie 有效时长 (单位：秒)-->
+            <max-age>600</max-age>
+        </cookie-config>
+        <!--session 有效时长 (单位:分钟)-->
+        <session-timeout>120</session-timeout>
+    </session-config>
+
+    <!--首页-->
+    <welcome-file-list>
+        <welcome-file>/WEB-INF/index.html</welcome-file>
+    </welcome-file-list>
+
+    <!--错误页面-->
+    <error-page>
+        <exception-type>java.lang.Exception</exception-type>
+        <location>/WEB-INF/error.html</location>
+    </error-page>
 
 </web-app>
 ```
@@ -160,9 +254,10 @@ spring配置 application.xml
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:context="http://www.springframework.org/schema/context" xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:aop="http://www.springframework.org/schema/aop"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
-        https://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd">
-
+        https://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/aop https://www.springframework.org/schema/aop/spring-aop.xsd"
+>
     <!--扫描除Controller层外的所有层-->
     <context:component-scan base-package="ghost">
         <!--排除controller层-->
@@ -192,6 +287,9 @@ spring配置 application.xml
           p:basePackage="ghost.dao"
     />
 
+    <!--开启注解@Aspect-->
+    <aop:aspectj-autoproxy/>
+
 </beans>
 ```
 
@@ -209,8 +307,21 @@ SpringMVC配置 spring-mvc.xml
     <!--扫描Controller 层-->
     <context:component-scan base-package="ghost.controller"/>
 
-    <!--开启MVC注解-->
-    <mvc:annotation-driven />
+    <!--开启注解-->
+    <mvc:annotation-driven>
+        <!--修改默认编码-->
+        <mvc:message-converters register-defaults="true">
+            <bean class="org.springframework.http.converter.StringHttpMessageConverter">
+                <constructor-arg value="UTF-8" />
+            </bean>
+        </mvc:message-converters>
+    </mvc:annotation-driven>
+
+    <!--静态资源-->
+    <mvc:resources mapping="/CSS/**" location="/WEB-INF/CSS/"/>
+    <mvc:resources mapping="/JS/**" location="/WEB-INF/JS/"/>
+    <mvc:resources mapping="/IMAG/**" location="/WEB-INF/IMAG/"/>
+    <mvc:resources mapping="/TTF/**" location="/WEB-INF/TTF/"/>
 
     <!--使用MVC默认拦截器-->
     <mvc:default-servlet-handler/>
@@ -218,7 +329,7 @@ SpringMVC配置 spring-mvc.xml
     <!--配置InternalResourceViewResolver-->
     <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver"
           p:prefix="/WEB-INF/views/"
-          p:suffix=".jsp"
+          p:suffix=".html"
     />
 
 </beans>

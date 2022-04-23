@@ -1,3 +1,9 @@
+# test
+> 作者 : RedCrazyGhost
+> 创建时间 : 2022-04-22 20:07
+> 修改时间 : 2022-04-22 20:07
+> 标签 : <span class="badge bg-secondary">Mac OS</span> <span class="badge bg-danger">问题</span> <span class="badge bg-success">解决</span> <span class="badge bg-warning text-dark">未解决</span>  <span class="badge bg-primary">Java</span> <span class="badge bg-primary">JavaScrpit</span> <span class="badge bg-primary">Python</span> 
+
 ```properties
 jdbc.url=jdbc:mysql://localhost:3306/database
 jdbc.username=username
@@ -13,3 +19,4 @@ return !this.options.highlight || null != (t = this.options.highlight(e, n)) && 
 
 : "<pre><code>" + (u ? e : c(e, !0)) + "</code></pre>\n"
 ```
+
