@@ -1,8 +1,8 @@
 # 第十三届蓝桥杯JavaB组题目
 > 作者 : RedCrazyGhost
 > 创建时间 : 2022-04-9 
-> 修改时间 : 2022-04-23
-> 标签 :  <span class="badge bg-secondary">Mac OS</span> <span class="badge bg-primary">Java</span> <span class="badge bg-dark">算法</span>
+> 修改时间 : 2022-04-24
+> 标签 :  <span class="badge bg-secondary">Mac OS</span> <span class="badge bg-primary">Java</span> <span class="badge bg-black">算法</span>
 
 ### 试题 A: 星期计算
 >本题总分： 5 分
