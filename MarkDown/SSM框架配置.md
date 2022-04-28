@@ -1,7 +1,8 @@
 # SSM框架配置
 > 作者 : RedCrazyGhost
 > 创建时间 : 2022-04-14
-> 修改时间 : 2022-04-23
+> 修改时间 : 2022-04-28
+> 阅读时长 : 30分钟
 > 标签 :  <span class="badge bg-secondary">Mac OS</span> <span class="badge rounded-pill bg-success">Spring</span> <span class="badge rounded-pill bg-success">Spring MVC</span> <span class="badge rounded-pill bg-success">MyBatis</span> <span class="badge bg-primary">Java</span> 
 
 Maven POM.xml
