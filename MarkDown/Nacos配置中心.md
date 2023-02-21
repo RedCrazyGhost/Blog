@@ -1,7 +1,7 @@
 # Nacos配置中心
 > 作者 : RedCrazyGhost
 > 创建时间 : 2022-05-04
-> 修改时间 : 2022-05-04
+> 修改时间 : 2022-05-20
 > 阅读时长 : 5分钟
 > 标签 :  <span class="badge rounded-pill bg-success">Spring Cloud Alibaba</span> <span class="badge bg-primary">Java</span> 
 ### 前置的条件
