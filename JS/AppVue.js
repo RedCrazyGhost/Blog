@@ -12,10 +12,10 @@ var app = new Vue({
     created() {
         let nowTime = new Date().getHours()
         if (nowTime >= 7 && nowTime < 18) {
-            this.loadStyle("css/github.css")
+            this.loadStyle("CSS/github.css")
             this.WebSiteConfig.AppColor = "light"
         } else {
-            this.loadStyle("css/github-dark.css")
+            this.loadStyle("CSS/github-dark.css")
             this.WebSiteConfig.AppColor = "dark"
         }
 
