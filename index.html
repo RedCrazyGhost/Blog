@@ -1,58 +1,46 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh" xmlns:v-on="http://www.w3.org/1999/xhtml" xmlns:v-bind="http://www.w3.org/1999/xhtml">
 
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ghost's Blog</title>
-    
-    <script src="JS/debug.js"></script>
-    <!-- <script src="JS/vue-dev.js"></script> -->
-    <script src="JS/mermaid.min.js"></script>
-    <script src="JS/highlight.min.js"></script>
-    <script src="JS/vue.js"></script>
+    <meta name="author" content="RedCrazyGhost">
+    <meta name="description" content="RedCrazyGhost's Blog">
+<!--    <script src="JS/package/debug.js"></script>-->
+     <script src="JS/package/vue-dev.js"></script>
+<!--    <script src="JS/package/vue.js"></script>-->
+   <script src="JS/package/vue-router.js"></script>
+    <script src="JS/package/mermaid.min.js"></script>
+    <script src="JS/package/highlight.min.js"></script>
     <link href="CSS/bootstrap.min.css" rel="stylesheet">
     <link href="CSS/fontstyle.css" rel="stylesheet">
-    <script src="JS/bootstrap.bundle.min.js"></script>
-    <script src="JS/marked.min.js"></script>
-    <script src="JS/axios.min.js"></script>
+    <script src="JS/package/bootstrap.bundle.min.js"></script>
+    <script src="JS/package/marked.min.js"></script>
+    <script src="JS/package/axios.min.js"></script>
+    <script src="JS/package/FontAwesome.js"></script>
+<!--    组件-->
+    <script src="JS/component/TopNav.js"></script>
+    <script src="JS/component/BottomNav.js"></script>
+    <script src="JS/component/Markdown.js"></script>
+    <script src="JS/component/MiniMarkdown.js"></script>
+    
+<!--    页面-->
+    <script src="JS/view/Index.js"></script>
+    <script src="JS/view/Watch.js"></script>
+
+    <script src="JS/AppRouter.js"></script>
+
 </head>
 
-<body style="font-family:HYCuYuanJ">
-    <div id="App" :class="'container-fluid bg-'+WebSiteConfig.AppColor+' text-'+judgeColorChangeFontColor(WebSiteConfig.AppColor)">
-        <div class="row offset-1 col-10" style="padding-top: 2.5rem;">
-            <div class="text-center">
-                <h1>
-                    RedCrazyGhost's Blog
-                </h1>
-            </div>
-            <div>
-                <div class="input-group">
-                    <select v-model="targeMD" class="form-select" id="inputGroupSelect04"
-                        aria-label="Example select with button addon">
-                        <option selected>Choose...</option>
-                        <option v-for="(i,k) in Blogs">{{i}}</option>
-                    </select>
-                    <button v-on:click="getMarkDown" :class="this.WebSiteConfig.AppColor=='dark'? 'btn btn-outline-warning':'btn btn-outline-primary'" type="button">Button</button>
-                </div>
-                <div>
-                    <div v-show="isWarning" class="text-danger">请选择正确的名称！</div>
-                </div>
-            </div>
-
-            <div style="margin-top:2.5rem;">
-                <div id="markdown">
-                </div>
-            </div>
-        </div>
-        <nav :class="'by-4 navbar navbar-'+WebSiteConfig.AppColor+' bg-'+WebSiteConfig.AppColor">
-            <div class="container">
-                <span class="navbar-text">2022-2023 © {{WebSiteConfig.AppAuthor.name}}</span>
-                <a class="nav-link navbar-text" href="http://beian.miit.gov.cn/">鄂ICP备19031343号-1</a>
-                <span class="navbar-text">Web Site Version:{{WebSiteConfig.AppVersion}}</span>
-            </div>
-        </nav>
+<body style="font-family:HYCuYuanJ,system-ui">
+    <div id="App"  v-bind:class="'container-fluid '+getAppClassColor()">
+        <top-nav :web-site-config="WebSiteConfig"></top-nav>
+        <!-- <keep-alive> -->
+            <router-view  :web-site-config="WebSiteConfig" :Github="WebSiteConfig.Github" :view-data="ViewData"></router-view>
+        <!-- </keep-alive> -->
+        <bottom-nav :web-site-config="WebSiteConfig"></bottom-nav>
     </div>
 
 </body>

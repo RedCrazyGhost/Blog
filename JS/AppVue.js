@@ -2,80 +2,148 @@ var app = new Vue({
     el: '#App',
     mounted() {
         marked.setOptions({
-            highlight:function(code, lang, callback) {
-                language=lang;
-                return hljs.highlight(code,{language}).value;
+            highlight: function (code, lang, callback) {
+                language = lang;
+                return hljs.highlight(code, {language}).value;
             }
         })
-        mermaid.initialize({startOnLoad:true});
+        mermaid.initialize({startOnLoad: true});
     },
-    created() { 
-        var head = document.getElementsByTagName('HEAD').item(0);
-        var style = document.createElement('link');
-        style.rel = 'stylesheet';
-        style.type = 'text/css';
-        if (new Date().getHours()>=18||new Date().getHours()<=6) {
-            this.WebSiteConfig.AppColor="dark"
-            style.href = 'CSS/github-dark.css';
-        }else{
-            this.WebSiteConfig.AppColor="light"
-            style.href = 'CSS/github.css';
+    created() {
+        let nowTime = new Date().getHours()
+        if (nowTime >= 7 && nowTime < 18) {
+            this.loadStyle("css/github.css")
+            this.WebSiteConfig.AppColor = "light"
+        } else {
+            this.loadStyle("css/github-dark.css")
+            this.WebSiteConfig.AppColor = "dark"
         }
-        head.appendChild(style);
-        
-        let _this=this
 
-        
-        axios.get("./Blog.json").then(function(response){
-            _this.Blogs=response.data;
-        }).catch(function (error){
-            axios.get(_this.CDNurl+"MarkDown/Blog.json").then(function(response){
-                _this.Blogs=response.data;
-            })
-        })
-       
-        
     },
     data() {
         return {
-            CDNurl:"https://cdn.jsdelivr.net/gh/RedCrazyGhost/CDN@last/",
-            Blogs: [],
-            targeMD: "Choose...",
-            isWarning: false,
             WebSiteConfig: {
+                Github:{
+                    APIURL:"https://api.github.com",
+                    owner:"RedCrazyGhost",
+                    repo:"test",
+                    token:"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"
+                },
                 AppAuthor: {
                     name: "RedCrazyGhost",
-                    src: "IMAG/Author.jpeg",
+                    imgURL: "IMAG/Author.jpeg",
                 },
                 AppVersion: "0.0.1",
                 AppColor: "light",
                 AppFontFamily: "HYCuYuanJ"
             },
+            ViewData:{
+                Index:{
+                    List:{}
+                },
+                Watch:{
+                    Markdown:{}
+                }
+            }
         };
     },
     methods: {
-        getMarkDown() {
-            if (this.targeMD !== "Choose...") {
-                axios.get("./MarkDown/" + this.targeMD + ".md")
-                    .then(function (response) {
-                        document.getElementById('markdown').innerHTML =  marked.parse(response.data);
-                        mermaid.init();
-                    })
-                    .catch(function (error) {
-                        console.log(error);
-                    });
-                isWarning = false;
-            } else {
-                isWarning = true;
-            }
+        loadStyle(url) {
+            var link = document.createElement("link");
+            link.rel = "stylesheet";
+            link.type = "text/css";
+            link.href = url;
+            var head = document.getElementsByTagName("head")[0];
+            head.appendChild(link);
         },
-        judgeColorChangeFontColor(color) {
-            switch (color) {
+        // getMarkDown() {
+        //     if (this.targeMD !== "Choose...") {
+        //         axios.get("./MarkDown/" + this.targeMD + ".md")
+        //             .then(function (response) {
+        //                 document.getElementById('markdown').innerHTML = marked.parse(response.data);
+        //                 mermaid.init();
+        //             })
+        //             .catch(function (error) {
+        //                 console.log(error);
+        //             });
+        //         isWarning = false;
+        //     } else {
+        //         isWarning = true;
+        //     }
+        // },
+        getAppFontColor() {
+            let appFontColor = "text-"
+            switch (this.WebSiteConfig.AppColor) {
                 case "light":
-                    return "dark";
+                    appFontColor += "dark";
+                    break
                 case "dark":
-                    return "light";
+                    appFontColor += "light";
+                    break
+                default:
+                    appFontColor += "dark";
+            }
+            return appFontColor
+        },
+        getAppBackgroundColor() {
+            return "bg-" + this.WebSiteConfig.AppColor
+        },
+        getAppClassColor() {
+            return this.getAppBackgroundColor() + " " + this.getAppFontColor()
+        },
+        getAppColor() {
+            return this.WebSiteConfig.AppColor
+        },
+        getAuthor() {
+            return this.WebSiteConfig.AppAuthor
+        },
+        getVersion() {
+            return this.WebSiteConfig.AppVersion
+        },
+        changeAppColor() {
+            if (this.WebSiteConfig.AppColor === "light") {
+                this.WebSiteConfig.AppColor = "dark"
+            } else {
+                this.WebSiteConfig.AppColor = "light"
             }
         },
-    }
-})
+        readTime(str){
+            readSecond=str.length/7
+            result=""
+            hour=parseInt(readSecond/3600%60)
+            minute=parseInt(readSecond/60%60)
+            second=parseInt(readSecond%60)
+            if (hour!=0){
+                result+=hour+"小时"
+            }
+            if (minute!=0){
+                result+=minute+"分钟"
+            }
+            if (second!=0){
+                result+=second+"秒"
+            }
+            if (result.length==0) {
+                return "1秒"
+            }
+            return result
+        },
+        toTime(datetime){
+            object=new Date(datetime)
+            return object.getFullYear()+"-"+(object.getMonth()+1)+"-"+(object.getDate()+1)
+        },
+        getCallout(){
+            switch(app.WebSiteConfig.AppColor){
+                case "dark":
+                    return "callout callout-wanring"
+                case "light":
+                default:
+                    return "callout callout-info"
+            }
+        }
+    },
+    components: {
+        "top-nav": TopNav,
+        "bottom-nav": BottomNav,
+    },
+    router: AppRouters
+});
