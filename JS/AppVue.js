@@ -27,7 +27,7 @@ var app = new Vue({
                     APIURL:"https://api.github.com",
                     owner:"RedCrazyGhost",
                     repo:"test",
-                    token:"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"
+                    token:"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"
                 },
                 AppAuthor: {
                     name: "RedCrazyGhost",
