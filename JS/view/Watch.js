@@ -8,7 +8,8 @@ var ViewWatch={
             app.ViewData.Watch.Markdown=markdown
             
         }else{
-            axios.get(this.Github.APIURL+"/repos/"+this.Github.owner+"/"+this.Github.repo+"/issues/"+this.targetId
+            url=this.Github.APIURL+"/repos/"+this.Github.owner+"/"+this.Github.repo+"/issues/"+this.targetId
+            axios.get(url
             ,{
                 headers: {
                     'Accept': 'application/vnd.github+json',
@@ -20,6 +21,12 @@ var ViewWatch={
             })
             .catch(function (error) {
                 console.log(error);
+                axios.get(url).then(function (response) {
+                        app.ViewData.Watch.Markdown=response.data
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
             });
         }
     },

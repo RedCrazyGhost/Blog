@@ -2,7 +2,8 @@ var ViewIndex = {
     props: ['Index','Github'],
     created(){
         if (Object.keys(this.Index.List).length === 0 ) {
-            axios.get(this.Github.APIURL+"/repos/"+this.Github.owner+"/"+this.Github.repo+"/issues",{
+            url=this.Github.APIURL+"/repos/"+this.Github.owner+"/"+this.Github.repo+"/issues"
+            axios.get(url,{
                 headers: {
                     'Accept': 'application/vnd.github+json',
                     'Authorization': 'Bearer '+this.Github.token,
@@ -12,6 +13,12 @@ var ViewIndex = {
             })
             .catch(function (error) {
                 console.log(error);
+                axios.get(url).then(function (response) {
+                     app.ViewData.Index.List=response.data
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
             });
         }
     },
