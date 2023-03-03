@@ -35,7 +35,6 @@ var MiniMarkdown={
     methods: {
         parserMiniMD(){
             str=this.Markdown.body
-            console.log(str.substring(0,str.indexOf('#',50)));
             document.getElementById('miniMD-'+this.Markdown.number).innerHTML=marked.parse(str.substring(0,str.indexOf('#',50)));
             mermaid.init();
         },

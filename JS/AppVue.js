@@ -32,7 +32,7 @@ var app = new Vue({
                     name: "RedCrazyGhost",
                     imgURL: "IMAG/Author.jpeg",
                 },
-                AppVersion: "1.0.0",
+                AppVersion: "1.0.1",
                 AppColor: "light",
                 AppFontFamily: "HYCuYuanJ"
             },
