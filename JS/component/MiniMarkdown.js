@@ -1,33 +1,58 @@
 var MiniMarkdown={
     props: ['Markdown'],
+    mounted(){
+        this.parserMiniMD()
+    },
+    beforeUpdate(){
+        this.parserMiniMD()
+    },
+    updated(){
+        this.parserMiniMD()
+    },
     template: `
-    <router-link :to="{ name: 'watch', params: { targetId: Markdown.number }}" @click="setMarkdown(Markdown)">
-    <div :class="'card '+getAppClassColor()">
-    <h5 class="card-header">{{Markdown.title}} #{{Markdown.number}}</h5>
+    <div :class="'card card-'+getAppColor()+' '+getAppClassColor()" style="margin-top: 1.5rem;    padding-right: 0px;
+    padding-left: 0px;">
+        <router-link  :class="getAppClassColor()" :to="{ name: 'watch', params: { targetId: Markdown.number }}">
+        <div :class="'card-header header-'+getAppColor()">    
+        <h5 >{{Markdown.title}} #{{Markdown.number}}</h5>
+        </div>   
         <div class="card-body">
-        </div>
-        <div class="card-footer">
+            <div :id="'miniMD-'+Markdown.number"></div>
+            <p class="card-text"><small class="text-muted">详细内容请单击查看！</small></p>
+            <p class="card-text">
+            <small class="text-muted"><i class="fa-regular fa-calendar-plus"></i> {{toTime(Markdown.created_at)}}</small> 
+            <small class="text-muted"><i class="fa-solid fa-hourglass-half"></i> {{toTime(Markdown.updated_at)}}</small>
+            </p>
+            </div>
+            </router-link>
+            <div :class="'card-footer footer-'+getAppColor()" v-if="Markdown.labels.length!==0">
+        <span class="badge" v-bind:style="{backgroundColor:'#'+tag.color+' !important',marginRight: '6px'}" v-for="tag in Markdown.labels" :key="tag.id">{{tag.name}}</span>
         </div>
     </div>
-    </router-link>
+ 
     
     `,
     methods: {
-        setMarkdown(markdown){
-            app.ViewData.Watch.Markdown=markdown
-            console.log(app.ViewData.Watch.Markdown);
+        parserMiniMD(){
+            str=this.Markdown.body
+            console.log(str.substring(0,str.indexOf('#',50)));
+            document.getElementById('miniMD-'+this.Markdown.number).innerHTML=marked.parse(str.substring(0,str.indexOf('#',50)));
+            mermaid.init();
         },
         readTime(str){
             return app.readTime(str)
         },
         toTime(datetime){
-            return app.readTime(datetime)
+            return app.toTime(datetime)
         },
         getCallout(){
             return app.getCallout()
         },
         getAppClassColor(){
             return app.getAppClassColor()
+        },
+        getAppColor(){
+            return app.getAppColor()
         }
     }
 }

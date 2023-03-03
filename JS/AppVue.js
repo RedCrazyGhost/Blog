@@ -26,14 +26,13 @@ var app = new Vue({
                 Github:{
                     APIURL:"https://api.github.com",
                     owner:"RedCrazyGhost",
-                    repo:"test",
-                    token:"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",
-                                },
+                    repo:"Blog",
+                    token:"",                                },
                 AppAuthor: {
                     name: "RedCrazyGhost",
                     imgURL: "IMAG/Author.jpeg",
                 },
-                AppVersion: "0.0.1",
+                AppVersion: "1.0.0",
                 AppColor: "light",
                 AppFontFamily: "HYCuYuanJ"
             },

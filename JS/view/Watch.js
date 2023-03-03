@@ -4,6 +4,10 @@ var ViewWatch={
         'i-markdown': Markdown
     },
     created(){
+        scrollTo({
+            top:0,
+        })
+
         if (Object.keys(this.List).length !== 0&& Object.keys(markdown=app.ViewData.Index.List.find(element => element.number ===this.targetId)).length !== 0 ) {
             app.ViewData.Watch.Markdown=markdown
             
@@ -29,10 +33,11 @@ var ViewWatch={
                     });
             });
         }
+
     },
     template: `
     <div>
-        <i-markdown :app-color="WebSiteConfig.AppColor" :Markdown="Watch.Markdown"  class="row offset-1 col-10"></i-markdown>
+        <i-markdown :app-color="WebSiteConfig.AppColor" :Markdown="Watch.Markdown" class="row offset-1 col-10"></i-markdown>
     </div>  
     `,
 }

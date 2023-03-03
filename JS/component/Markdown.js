@@ -18,7 +18,7 @@ var Markdown = {
     <p>创建时间 : {{toTime(Markdown.created_at)}}</p>
     <p>修改时间 : {{toTime(Markdown.updated_at)}}</p>
     <p>阅读时长 : {{readTime(Markdown.body)}}</p>
-    <p>标签 : <span class="badge" v-bind:style="{backgroundColor:'#'+tag.color+' !important',marginRight: '6px'}" v-for="tag in Markdown.labels" :key="tag.id">{{tag.name}}</span> 
+    <p v-if="Markdown.labels.length!==0">标签 : <span class="badge" v-bind:style="{backgroundColor:'#'+tag.color+' !important',marginRight: '6px'}" v-for="tag in Markdown.labels" :key="tag.id">{{tag.name}}</span>
     </p>
     </blockquote>
     <div id="markdown">

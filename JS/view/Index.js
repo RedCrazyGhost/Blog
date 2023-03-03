@@ -26,7 +26,7 @@ var ViewIndex = {
        'i-m-markdown':MiniMarkdown
     },
     template: `
-    <div>
+    <div class="row offset-1 col-10">
         <i-m-markdown v-for="markdown in Index.List" :key="markdown.number" :Markdown="markdown">{{markdown.number}}</i-m-markdown>
     </div>
     `,

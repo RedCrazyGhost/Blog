@@ -4910,6 +4910,13 @@ fieldset:disabled .btn {
     border-radius: .25rem
 }
 
+.card-light{
+    border: 1px solid rgba(0, 0, 0, .125);
+}
+.card-dark{
+    border: 1px solid rgba(255, 255, 255, .125);
+}
+
 .card>hr {
     margin-right: 0;
     margin-left: 0
@@ -4970,6 +4977,14 @@ fieldset:disabled .btn {
     border-bottom: 1px solid rgba(0, 0, 0, .125)
 }
 
+.header-light {
+    background-color: rgba(0, 0, 0, .03);
+    border-bottom: 1px solid rgba(0, 0, 0, .125)
+}
+.header-dark {
+    background-color: rgba(255, 255, 255, .03);
+    border-bottom: 1px solid rgba(255, 255, 255, .125)
+}
 .card-header:first-child {
     border-radius: calc(.25rem - 1px) calc(.25rem - 1px) 0 0
 }
@@ -4978,6 +4993,15 @@ fieldset:disabled .btn {
     padding: .5rem 1rem;
     background-color: rgba(0, 0, 0, .03);
     border-top: 1px solid rgba(0, 0, 0, .125)
+}
+
+.footer-light {
+    background-color: rgba(0, 0, 0, .03);
+    border-top: 1px solid rgba(0, 0, 0, .125)
+}
+.footer-dark {
+    background-color: rgba(255, 255, 255, .03);
+    border-top: 1px solid rgba(255, 255, 255, .125)
 }
 
 .card-footer:last-child {
