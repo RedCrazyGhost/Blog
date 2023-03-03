@@ -1,5 +1,8 @@
 var MiniMarkdown={
     props: ['Markdown'],
+    components: {
+        'i-tag': Tag
+    },
     mounted(){
         this.parserMiniMD()
     },
@@ -26,7 +29,7 @@ var MiniMarkdown={
             </div>
             </router-link>
             <div :class="'card-footer footer-'+getAppColor()" v-if="Markdown.labels.length!==0">
-        <span class="badge" v-bind:style="{backgroundColor:'#'+tag.color+' !important',marginRight: '6px'}" v-for="tag in Markdown.labels" :key="tag.id">{{tag.name}}</span>
+            <i-tag  v-for="tag in Markdown.labels" :key="tag.id" :tag="tag"></i-tag>
         </div>
     </div>
  

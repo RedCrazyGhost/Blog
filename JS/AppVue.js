@@ -32,7 +32,7 @@ var app = new Vue({
                     name: "RedCrazyGhost",
                     imgURL: "IMAG/Author.jpeg",
                 },
-                AppVersion: "1.0.1",
+                AppVersion: "1.0.2",
                 AppColor: "light",
                 AppFontFamily: "HYCuYuanJ"
             },
@@ -55,21 +55,6 @@ var app = new Vue({
             var head = document.getElementsByTagName("head")[0];
             head.appendChild(link);
         },
-        // getMarkDown() {
-        //     if (this.targeMD !== "Choose...") {
-        //         axios.get("./MarkDown/" + this.targeMD + ".md")
-        //             .then(function (response) {
-        //                 document.getElementById('markdown').innerHTML = marked.parse(response.data);
-        //                 mermaid.init();
-        //             })
-        //             .catch(function (error) {
-        //                 console.log(error);
-        //             });
-        //         isWarning = false;
-        //     } else {
-        //         isWarning = true;
-        //     }
-        // },
         getAppFontColor() {
             let appFontColor = "text-"
             switch (this.WebSiteConfig.AppColor) {
