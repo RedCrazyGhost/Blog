@@ -9,6 +9,13 @@
  /**
  * changer：redcrazyghost
  */
+ #markdown >img {
+    width: 100%;
+ }
+ #markdown >p>img {
+    width: 100%;
+ }
+
 .pre-light{
     background-color: #f6f8fa;
 }

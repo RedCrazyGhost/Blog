@@ -30,10 +30,12 @@ var ViewIndex = {
         }
     },
     components: {
-       'i-m-markdown':MiniMarkdown
+       'i-m-markdown':MiniMarkdown,
+       'i-loading':Loading
     },
     template: `
     <div class="row offset-1 col-10">
+        <i-loading :data="Index.List"/>
         <i-m-markdown v-for="markdown in Index.List" :key="markdown.number" :Markdown="markdown">{{markdown.number}}</i-m-markdown>
     </div>
     `,

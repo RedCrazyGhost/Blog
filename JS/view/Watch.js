@@ -1,7 +1,8 @@
 var ViewWatch={
     props: ['List','Github','Watch','targetId','WebSiteConfig'],
     components: {
-        'i-markdown': Markdown
+        'i-markdown': Markdown,
+        'i-loading':Loading
     },
     created(){
         scrollTo({
@@ -37,6 +38,7 @@ var ViewWatch={
     },
     template: `
     <div>
+        <i-loading :data="Watch.Markdown" />
         <i-markdown :app-color="WebSiteConfig.AppColor" :Markdown="Watch.Markdown" class="row offset-1 col-10"></i-markdown>
     </div>  
     `,

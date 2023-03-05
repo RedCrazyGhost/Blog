@@ -6,7 +6,7 @@ var AppRouters = new VueRouter({
             component: {
                 props:['ViewData','Github'],
                 components: {
-                    'view-index':ViewIndex
+                    'view-index':ViewIndex,
                 },
                 template: `
                 <div>
@@ -21,7 +21,7 @@ var AppRouters = new VueRouter({
             component: {
                 props:['ViewData','Github','WebSiteConfig'],
                 components: {
-                    'view-watch':ViewWatch
+                    'view-watch':ViewWatch,
                 },
                 template: `
                 <div>
