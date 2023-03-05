@@ -16,7 +16,7 @@ var BottomNav = {
             req.open('GET', window.location.href, false);
             req.send(null);
             let data=req.getAllResponseHeaders().toLowerCase().split('\r\n')
-            for (str of data.split('\r\n')){ 
+            for (str of data){ 
                 if(str.indexOf('server: github')!==-1){
                     return 'Github Package'
                 }
