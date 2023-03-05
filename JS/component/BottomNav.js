@@ -12,17 +12,15 @@ var BottomNav = {
     `,
     methods: {
         getServer(){
-            var req = new XMLHttpRequest();
+            let req = new XMLHttpRequest();
             req.open('GET', window.location.href, false);
             req.send(null);
-            req.getAllResponseHeaders().toLowerCase().split('\r\n').forEach(val=>{
-                if (val.indexOf('github')!==-1) {
+            let data=req.getAllResponseHeaders().toLowerCase().split('\r\n')
+            for (str of data.split('\r\n')){ 
+                if(str.indexOf('server: github')!==-1){
                     return 'Github Package'
                 }
-                if (val.indexOf('Gitee')!==-1) {
-                    return 'Gitee'
-                }
-            })
+            }
             return ''
         },
         getAppBackgroundColor() {
