@@ -26,7 +26,7 @@ var app = new Vue({
                 Github:{
                     APIURL:"https://api.github.com",
                     owner:"RedCrazyGhost",
-                    repo:"Blog",
+                    repo:"blog",
                     token:"",                                },
                 AppAuthor: {
                     name: "RedCrazyGhost",

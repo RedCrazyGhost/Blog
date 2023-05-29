@@ -18,7 +18,7 @@ var ViewWatch={
             ,{
                 headers: {
                     'Accept': 'application/vnd.github+json',
-                    'Authorization': 'Bearer '+this.Github.token,
+                    // 'Authorization': 'Bearer '+this.Github.token,
                 }
             }
             ).then(function (response) {

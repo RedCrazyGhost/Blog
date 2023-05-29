@@ -56,7 +56,7 @@ var Markdown = {
         },
         toTime(datetime){
             object=new Date(datetime)
-            return object.getFullYear()+"-"+(object.getMonth()+1)+"-"+(object.getDate()+1)
+            return object.getFullYear()+"-"+(object.getMonth()+1)+"-"+object.getDate()+" "+object.getHours()+":"+object.getMinutes()
         },
         getCallout(){
             switch(this.AppColor){

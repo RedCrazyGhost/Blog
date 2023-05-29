@@ -7,7 +7,7 @@ var ViewIndex = {
             axios.get(url,{
                 headers: {
                     'Accept': 'application/vnd.github+json',
-                    'Authorization': 'Bearer '+this.Github.token,
+                    // 'Authorization': 'Bearer '+this.Github.token,
                 }
             }).then(function (response) {
                  app.ViewData.Index.List=response.data
