@@ -16,6 +16,21 @@ var AppRouters = new VueRouter({
             },
         },
         {
+            name: "Test",
+            path: '/test',
+            component: {
+                props:['ViewData','Github'],
+                components: {
+                    'view-test':ViewTest,
+                },
+                template: `
+                <div>
+                    <view-test :Github="Github" :Index="ViewData.Index"></view-test>
+                </div>
+                `
+            },
+        },
+        {
             name: "watch",
             path: '/watch/:targetId(\\d+)',
             component: {
