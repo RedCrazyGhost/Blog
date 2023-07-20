@@ -35,7 +35,7 @@ var ViewIndex = {
     },
     template: `
     <div class="row offset-1 col-10">
-        <i-loading :data="Index.List"/>
+        <i-loading :isShow="Object.keys(Index.List).length===0"/>
         <i-m-markdown v-for="markdown in Index.List" :key="markdown.number" :Markdown="markdown">{{markdown.number}}</i-m-markdown>
     </div>
     `,

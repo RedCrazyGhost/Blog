@@ -38,7 +38,7 @@ var ViewWatch={
     },
     template: `
     <div>
-        <i-loading :data="Watch.Markdown" />
+        <i-loading :isShow="Object.keys(Watch.Markdown).length===0" />
         <i-markdown :app-color="WebSiteConfig.AppColor" :Markdown="Watch.Markdown" class="row offset-1 col-10"></i-markdown>
     </div>  
     `,
