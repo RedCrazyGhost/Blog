@@ -1,7 +1,7 @@
 var BottomNav = {
     props: ['WebSiteConfig'],
     template: `
-    <nav style="margin-top: 1.5rem;" v-bind:class="'by-4 navbar navbar-'+getAppColor()+' '+getAppBackgroundColor()">
+    <nav id="BottomNav" style="margin-top: 1.5rem;" v-bind:class="'by-4 navbar navbar-'+getAppColor()+' '+getAppBackgroundColor()">
             <div class="container">
                 <span class="navbar-text">2022-2023 © {{getAuthorName()}}</span>
                 <span class="navbar-text" v-if="getServer().length!==0">{{getServer()}}</span>

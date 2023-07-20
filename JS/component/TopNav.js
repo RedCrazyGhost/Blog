@@ -1,7 +1,7 @@
 var TopNav = {
     props: ['WebSiteConfig'],
     template: `
-    <nav v-bind:class="'by-4 navbar navbar-expand-lg navbar-'+getAppColor()+' '+getAppBackgroundColor()">
+    <nav id="TopNav" v-bind:class="'by-4 navbar navbar-expand-lg navbar-'+getAppColor()+' '+getAppBackgroundColor()">
         <div class="container">
             <router-link class="navbar-brand" to="/">
                 <h1>RedCrazyGhost's Blog</h1>
