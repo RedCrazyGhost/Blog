@@ -23,7 +23,6 @@ var Loading={
         this.TopNavH=document.getElementById('TopNav').scrollHeight,
         this.BottomNavH=document.getElementById('BottomNav').scrollHeight
         this.SetH=this.WindowH-this.TopNavH-this.BottomNavH-16<0?0:this.WindowH-this.TopNavH-this.BottomNavH-16;
-        console.log(this.WindowH,this.TopNavH,this.BottomNavH,this.SetH);
     },
     methods:{
       
