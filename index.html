@@ -34,7 +34,11 @@
 <!--    页面-->
     <script src="JS/view/Index.js"></script>
     <script src="JS/view/Watch.js"></script>
-    <script src="JS/view/Test.js"></script>
+    <script src="JS/view/Image.js"></script>
+
+    
+    <!-- <script src="test/component/User.js"></script> -->
+    <!-- <script src="test/view/Test.js"></script> -->
 
     <script src="JS/AppRouter.js"></script>
 
@@ -44,7 +48,7 @@
     <div id="App"  v-bind:class="'container-fluid '+getAppClassColor()">
         <top-nav :web-site-config="WebSiteConfig"></top-nav>
         <!-- <keep-alive> -->
-            <router-view  :web-site-config="WebSiteConfig" :Github="WebSiteConfig.Github" :view-data="ViewData"></router-view>
+            <router-view :web-site-config="WebSiteConfig" :view-data="ViewData"></router-view>
         <!-- </keep-alive> -->
         <bottom-nav :web-site-config="WebSiteConfig"></bottom-nav>
     </div>
