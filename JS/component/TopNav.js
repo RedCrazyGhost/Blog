@@ -1,12 +1,28 @@
 var TopNav = {
     props: ['WebSiteConfig'],
     template: `
-    <nav id="TopNav" v-bind:class="'by-4 navbar navbar-expand-lg navbar-'+getAppColor()+' '+getAppBackgroundColor()">
+    <nav id="TopNav" v-bind:class="'by-4 navbar navbar-expand-md navbar-'+getAppColor()+' '+getAppBackgroundColor()">
         <div class="container">
             <router-link class="navbar-brand" to="/">
                 <h1>RedCrazyGhost's Blog</h1>
             </router-link>
-            <i v-bind:class="changeIClass()" v-bind:style="changeIStyle()"  @click="changeAppColor()"></i>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarToggler" aria-controls="navbarToggler" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+
+            <div class="collapse navbar-collapse" id="navbarToggler">
+                <ul class="navbar-nav ms-auto"">
+                    <li class="nav-item">
+                        <router-link class="nav-link" to="/">首页</router-link>
+                    </li>
+                    <li class="nav-item">
+                        <router-link class="nav-link" to="/image">摄影</router-link>
+                    </li>
+                    <li class="nav-item">
+                        <i v-bind:class="changeIClass()" v-bind:style="changeIStyle()"  @click="changeAppColor()"></i>        
+                    </li>
+                </ul>
+            </div>
         </div>
     </nav>
     `,
