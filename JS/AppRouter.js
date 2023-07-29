@@ -4,28 +4,43 @@ var AppRouters = new VueRouter({
             name: "index",
             path: '/',
             component: {
-                props:['ViewData','Github'],
+                props:['ViewData','WebSiteConfig'],
                 components: {
                     'view-index':ViewIndex,
                 },
                 template: `
                 <div>
-                    <view-index :Github="Github" :Index="ViewData.Index"></view-index>
+                    <view-index :Github="WebSiteConfig.Github" :Index="ViewData.Index"></view-index>
                 </div>
                 `
             },
         },
         {
-            name: "Test",
+            name: "image",
+            path: '/Image',
+            component: {
+                props:['ViewData','WebSiteConfig'],
+                components: {
+                    'view-image':ViewImage,
+                },
+                template: `
+                <div>
+                    <view-image/>
+                </div>
+                `
+            },
+        },
+        {
+            name: "test",
             path: '/test',
             component: {
-                props:['ViewData','Github'],
+                props:['ViewData','WebSiteConfig'],
                 components: {
                     'view-test':ViewTest,
                 },
                 template: `
                 <div>
-                    <view-test :Github="Github" :Index="ViewData.Index"></view-test>
+                    <view-test :web-site-config="WebSiteConfig" :view-data="ViewData"></view-test>
                 </div>
                 `
             },
@@ -34,13 +49,13 @@ var AppRouters = new VueRouter({
             name: "watch",
             path: '/watch/:targetId(\\d+)',
             component: {
-                props:['ViewData','Github','WebSiteConfig'],
+                props:['ViewData','WebSiteConfig'],
                 components: {
                     'view-watch':ViewWatch,
                 },
                 template: `
                 <div>
-                    <view-watch :web-site-config="WebSiteConfig"  :List="ViewData.Index.List" :Github="Github" :Watch="ViewData.Watch" :targetId="$route.params.targetId"></view-watch>
+                    <view-watch :web-site-config="WebSiteConfig"  :List="ViewData.Index.List" :Github="WebSiteConfig.Github" :Watch="ViewData.Watch" :targetId="$route.params.targetId"></view-watch>
                 </div>
                 `
             },
