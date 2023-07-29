@@ -20,6 +20,13 @@ var BottomNav = {
                 if(str.indexOf('server: github')!==-1){
                     return 'Github Package'
                 }
+                switch (str) {
+                    case 'server: github':
+                        return 'Github Package'
+                    default:
+                        console.log(str);
+                        break;
+                }
             }
             return ''
         },
