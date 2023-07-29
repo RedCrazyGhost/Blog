@@ -31,21 +31,6 @@ var AppRouters = new VueRouter({
             },
         },
         {
-            name: "test",
-            path: '/test',
-            component: {
-                props:['ViewData','WebSiteConfig'],
-                components: {
-                    'view-test':ViewTest,
-                },
-                template: `
-                <div>
-                    <view-test :web-site-config="WebSiteConfig" :view-data="ViewData"></view-test>
-                </div>
-                `
-            },
-        },
-        {
             name: "watch",
             path: '/watch/:targetId(\\d+)',
             component: {
