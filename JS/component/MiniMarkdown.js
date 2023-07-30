@@ -13,7 +13,8 @@ var MiniMarkdown={
         this.parserMiniMD()
     },
     template: `
-    <div :class="'offset-1 col-10 card card-'+getAppColor()+' '+getAppClassColor()" style="margin-top: 1.5rem;">
+
+    <div :class="'shadow offset-1 col-10 card card-'+getAppColor()+' '+getAppClassColor()" style="margin-top: 1.5rem;">
             <div :class="'card-header header-'+getAppColor()">    
                  <router-link  :class="getAppClassColor()" :to="{ name: 'watch', params: { targetId: Markdown.number }}">
                 <h5>{{Markdown.title}} #{{Markdown.number}}</h5>
@@ -34,8 +35,7 @@ var MiniMarkdown={
             <i-tag  v-for="tag in Markdown.labels" :key="tag.id" :tag="tag"></i-tag>
         </div>
 
-    </div>
- 
+ </div>
     
     `,
     methods: {
