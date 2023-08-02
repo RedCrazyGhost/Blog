@@ -9,7 +9,9 @@ var TopNav = {
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarToggler" aria-controls="navbarToggler" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
           </button>
-
+            <div class="hidden-sm">
+            请使用平板或电脑查看！
+            </div>
             <div class="collapse navbar-collapse" id="navbarToggler">
                 <ul class="navbar-nav ms-auto"">
                     <li class="nav-item">
