@@ -9,6 +9,14 @@
  /**
  * changer：redcrazyghost
  */
+.hidden-sm {
+display: none;
+}
+@media (max-width: 575.98px) {
+.hidden-sm {
+    display: block;
+}
+}
  #markdown >img {
     width: 100%;
  }
