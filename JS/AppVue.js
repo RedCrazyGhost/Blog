@@ -9,7 +9,12 @@ var app = new Vue({
         })
         mermaid.initialize({startOnLoad: true});
     },
-    created() {
+    created() {        
+        var fontFile = new FontFace('HYCuYuanJ', 'url('+this.getCDNUrl('/TTF/HYCuYuanJ-Blog-RedCrazyGhost.ttf')+')');
+        fontFile.load().then(function (fontface) {
+            document.fonts.add(fontFile);
+        });
+
         let nowTime = new Date().getHours()
         if (nowTime >= 7 && nowTime < 18) {
             this.loadStyle("CSS/github.css")
@@ -18,11 +23,16 @@ var app = new Vue({
             this.loadStyle("CSS/github-dark.css")
             this.WebSiteConfig.AppColor = "dark"
         }
-
     },
     data() {
         return {
             WebSiteConfig: {
+                CDN:{
+                    owner:"RedCrazyGhost",
+                    repo:"CDN",
+                    version:"2023-08-03",
+                    url:"https://cdn.jsdelivr.net/gh/",
+                },
                 Github:{
                     APIURL:"https://api.github.com",
                     owner:"RedCrazyGhost",
@@ -47,6 +57,10 @@ var app = new Vue({
         };
     },
     methods: {
+        getCDNUrl(s){
+            let CDN=this.WebSiteConfig.CDN
+            return CDN.url+'/'+CDN.owner+'/'+CDN.repo+'@'+CDN.version+s;
+        },
         loadStyle(url) {
             var link = document.createElement("link");
             link.rel = "stylesheet";
