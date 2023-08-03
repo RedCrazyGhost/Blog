@@ -32,7 +32,7 @@ var app = new Vue({
                 CDN:{
                     owner:"RedCrazyGhost",
                     repo:"CDN",
-                    version:"2023-08-03",
+                    version:"",
                     url:"https://cdn.jsdelivr.net/gh/",
                 },
                 Github:{
@@ -61,7 +61,13 @@ var app = new Vue({
     methods: {
         getCDNUrl(s){
             let CDN=this.WebSiteConfig.CDN
-            return CDN.url+'/'+CDN.owner+'/'+CDN.repo+'@'+CDN.version+s;
+            if(CDN.version!==''){
+                // 最新CDN
+                return CDN.url+'/'+CDN.owner+'/'+CDN.repo+'@'+CDN.version+s;
+            }else{
+                return CDN.url+'/'+CDN.owner+'/'+CDN.repo+s;
+            }
+
         },
         loadStyle(url) {
             var link = document.createElement("link");
