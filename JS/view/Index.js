@@ -1,5 +1,5 @@
 var ViewIndex = {
-    props: ['Index','Github'],
+    props: ['Index','Github','isFontOk'],
     created(){
         let _this=this
         if (Object.keys(this.Index.List).length === 0 ) {
@@ -37,7 +37,7 @@ var ViewIndex = {
     <div>
         
 
-        <i-loading :isShow="Object.keys(Index.List).length===0"/>
+        <i-loading :isShow="Object.keys(Index.List).length===0&&!isFontOk"/>
         <i-m-markdown v-for="markdown in Index.List" :key="markdown.number" :Markdown="markdown">{{markdown.number}}</i-m-markdown>
     </div>
     `,

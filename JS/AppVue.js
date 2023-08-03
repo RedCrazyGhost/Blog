@@ -13,6 +13,7 @@ var app = new Vue({
         var fontFile = new FontFace('HYCuYuanJ', 'url('+this.getCDNUrl('/TTF/HYCuYuanJ-Blog-RedCrazyGhost.ttf')+')');
         fontFile.load().then(function (fontface) {
             document.fonts.add(fontFile);
+            this.app.WebSiteConfig.isFontOk=true
         });
 
         let nowTime = new Date().getHours()
@@ -27,6 +28,7 @@ var app = new Vue({
     data() {
         return {
             WebSiteConfig: {
+                isFontOk: false,
                 CDN:{
                     owner:"RedCrazyGhost",
                     repo:"CDN",

@@ -10,7 +10,7 @@ var AppRouters = new VueRouter({
                 },
                 template: `
                 <div>
-                    <view-index :Github="WebSiteConfig.Github" :Index="ViewData.Index"></view-index>
+                    <view-index :isFontOk="WebSiteConfig.isFontOk" :Github="WebSiteConfig.Github" :Index="ViewData.Index"></view-index>
                 </div>
                 `
             },
