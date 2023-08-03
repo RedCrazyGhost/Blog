@@ -10,7 +10,7 @@ var TopNav = {
             <span class="navbar-toggler-icon"></span>
           </button>
             <div class="hidden-sm">
-            请使用平板或电脑查看！
+            建议使用平板或电脑浏览！
             </div>
             <div class="collapse navbar-collapse" id="navbarToggler">
                 <ul class="navbar-nav ms-auto"">
