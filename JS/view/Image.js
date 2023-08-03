@@ -42,13 +42,13 @@ var ViewImage = {
           <p></p>
         </div>
       </div>
-      <!--<div class="carousel-item">
+      <div class="carousel-item">
         <img :src="getCDNUrl('/IMG/5.png')" class="d-block w-100" alt="奈良公园">
         <div class="carousel-caption d-none d-md-block">
           <h5>奈良公园</h5>
           <p></p>
         </div>
-      </div>-->
+      </div>
     </div>
   </div>
     </div>
