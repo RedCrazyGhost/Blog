@@ -1,0 +1,31 @@
+name: 'Auto Issues'
+
+env:
+  TZ: Asia/Shanghai
+
+on: issues
+jobs:
+  IssusToReadme:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    if: github.event.issue.number == 1
+    steps:
+    - name: watch issue context
+      run: |
+        echo "Issue title: ${{ github.event.issue.title }}"
+        echo "Issue body: ${{ github.event.issue.body }}"
+    - name: pull readme.md file
+      uses: actions/checkout@v3
+      with:
+        sparse-checkout: |
+          readme.md
+        sparse-checkout-cone-mode: false
+    - name: write readme.md file
+      run: echo "${{ github.event.issue.body }}" > readme.md
+    - name: push readme.md file
+      run: |
+        git config user.name [bot]github-actions
+        git config user.email github-actions@github.com
+        git add .
+        git commit -m "[bot]github action issues update readme.md"
+        git push
