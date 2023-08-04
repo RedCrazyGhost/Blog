@@ -4,7 +4,7 @@
 ### Github
 - [ ] issues分页
 - [ ] author内容
-- [ ] readme更新联动issues更新
+- [x] readme更新联动issues更新
 - [ ] markdonw接入github评论
 
 ### Gitee
