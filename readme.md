@@ -1,5 +1,18 @@
 # RedCrazyGhost's Blog
 
+## 开发计划
+### Github
+- [ ] issues分页
+- [ ] author内容
+- [ ] readme更新联动issues更新
+- [ ] markdonw接入github评论
+
+### Gitee
+- [ ] 完成开发者认证
+- [ ] 自动同步代码仓库和issues
+- [ ] 接入Gitee API
+
+
 ## 前言
 本项目使用的技术是Github Package&API
 技术优点：
@@ -16,3 +29,4 @@
 
 ## Github API
 咕咕～
+
