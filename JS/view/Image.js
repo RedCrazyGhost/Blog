@@ -17,7 +17,7 @@ var ViewImage = {
       <div class="carousel-item active">
         <img :src="getCDNUrl('/IMG/1.png')" class="d-block w-100" alt="江之岛拍摄的富士山">
         <div class="carousel-caption d-none d-md-block">
-          <h5>江山</h5>
+          <h5>岛-山</h5>
           <p>江之岛拍摄的富士山</p>
         </div>
       </div>
