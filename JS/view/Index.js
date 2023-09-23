@@ -35,10 +35,8 @@ var ViewIndex = {
     },
     template: `
     <div>
-        
-
-        <i-loading :isShow="Object.keys(Index.List).length===0&&!isFontOk"/>
-        <i-m-markdown v-for="markdown in Index.List" :key="markdown.number" :Markdown="markdown">{{markdown.number}}</i-m-markdown>
+        <i-loading v-if="Object.keys(Index.List).length===0||isFontOk===false"/>
+        <i-m-markdown v-else v-for="markdown in Index.List" :key="markdown.number" :Markdown="markdown">{{markdown.number}}</i-m-markdown>
     </div>
     `,
 };
