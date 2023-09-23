@@ -1,6 +1,6 @@
 # RedCrazyGhost's Blog
 
-## 开发计划
+## 开发计划（**无限期搁置**）
 ### Github
 - [ ] issues分页
 - [ ] author内容
