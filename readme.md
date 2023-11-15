@@ -8,7 +8,7 @@
 - [ ] markdonw接入github评论
 
 ### Gitee
-- [ ] 完成开发者认证
+- [x] 完成开发者认证
 - [ ] 自动同步代码仓库和issues
 - [ ] 接入Gitee API
 
