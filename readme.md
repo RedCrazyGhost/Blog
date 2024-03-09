@@ -1,14 +1,13 @@
 # RedCrazyGhost's Blog
 
 ## 开发计划（2024）
-
-### 重构项目
-
-目前项目单纯通过通过人工手动开发，难以维护，后续通过重构迁移使用包管理器，提高后续开发的可维护性和扩展性
+- [ ] 添加个人介绍页面
+- [ ] 增强代码块功能（复制、行号...）
 
 ## 前言
 
 本项目使用的技术是Github Package&API
+
 技术优点：
 
 - 免费：Github Package可以托管静态页面，免费域名使用(用户名.github.io)，也可以使用自己的域名，只需要DNS解析就可
@@ -18,6 +17,23 @@
 - 方便调用：Github API调用获取相关数据
 
 那我们就开始制作自己的Blog吧！
+
+### 项目框架
+
+- Vue3
+- sass - 样式处理
+- Vite - 打包工具
+- Eslint - 规范检查
+- Pinia + 变量状态管理
+- Bootstrap - 现成功能 + 样式
+- fontawesome - icon
+  > [添加依赖](https://fontawesome.com/v6/docs/web/use-with/vue/)
+  > [设置配置](https://fontawesome.com/v6/docs/web/use-with/vue/add-icons)
+  > [样式修改](https://fontawesome.com/v6/docs/web/use-with/vue/style)
+  >
+- octokit - github 官方SDK
+- mermaid - markdown 制图
+- marked - markdonw 解析器
 
 ## Github Package
 
