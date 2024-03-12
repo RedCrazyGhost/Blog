@@ -42,14 +42,14 @@ export const useGithubStore = defineStore('Github', () => {
       }
 
 
-      async function GetIssues(){
+      async function GetIssues(page:number){
         await octokit.rest.issues.listForRepo({
             owner: Github.value.owner,
             repo: Github.value.repo,
             creator: Github.value.owner,
             state: 'open',
             per_page: 10,
-            page:1
+            page:page
         }).then(res => {
           res.data.forEach((mData) => {
             m.AddMarkdown(mData)
