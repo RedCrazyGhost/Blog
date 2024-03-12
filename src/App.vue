@@ -3,7 +3,7 @@
     <TopNav />   
 
     <RouterView v-if="font.GetIsFontLoaded" id="router-view" style="min-height: calc(100vh - 9.75rem)"/>
-    <LoadingViewVue v-else/>
+    <LoadingViewVue v-else style="min-height: calc(100vh - 9.75rem)"/>
 
     <BottomNav />
   </div>
@@ -16,6 +16,7 @@ import BottomNav from './components/BottomNav.vue';
 import LoadingViewVue from './views/LoadingView.vue';
 import { useFontStore } from "@/stores/Font";
 import { useThemeStore } from '@/stores/Theme';
+
 const theme= useThemeStore()
 const  font  = useFontStore()
 font.LoadFont()
@@ -37,8 +38,8 @@ pre[class*='language-']::before {
 
 pre[class*='language-'] {
   position: relative;
-    padding: 2rem 1rem 0.5rem;
-    border-radius: 0.25rem;
+  padding: 2rem 1rem 0.5rem;
+  border-radius: 0.25rem;
 }
 
 .pre-light {
