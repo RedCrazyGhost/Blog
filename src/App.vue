@@ -2,8 +2,7 @@
   <div :class="'container-fluid '+theme.GetThemeStyle" :style={fontFamily:font.GetUseFont}>
     <TopNav />   
 
-    <RouterView v-if="font.GetIsFontLoaded" id="router-view" style="min-height: calc(100vh - 9.75rem)"/>
-    <LoadingViewVue v-else style="min-height: calc(100vh - 9.75rem)"/>
+    <RouterView id="router-view" style="min-height: calc(100vh - 9.75rem)"/>
 
     <BottomNav />
   </div>
@@ -13,7 +12,6 @@
 import { RouterView } from 'vue-router'
 import TopNav from "./components/TopNav.vue";
 import BottomNav from './components/BottomNav.vue';
-import LoadingViewVue from './views/LoadingView.vue';
 import { useFontStore } from "@/stores/Font";
 import { useThemeStore } from '@/stores/Theme';
 

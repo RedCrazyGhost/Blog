@@ -1,6 +1,6 @@
 {
   "name": "redcrazyghost-blog",
-  "version": "v1.0.5",
+  "version": "v1.0.6",
   "private": true,
   "type": "module",
   "scripts": {

@@ -1,8 +1,7 @@
 <template>
 <div>
-    <div>
-        <MiniMarkdown v-for="item in m.GetMarkdowns" :key="item.title" :Markdown="item"/>
-    </div>
+    <MiniMarkdown v-for="item in m.GetMarkdowns" :key="item.title" :Markdown="item"/>
+    <Loading v-if="m.GetMarkdowns.length == 0"/>
 </div>
 </template>
 
@@ -12,33 +11,33 @@ import { useGithubStore } from '@/stores/Github'
 import mermaid from 'mermaid';
 import { useMarkdownStore } from '@/stores/Markdown'
 import { onMounted, onUpdated } from 'vue';
+import Loading from '@/components/Loading.vue';
 
-
-var page = 1;
+const m = useMarkdownStore()
+const github = useGithubStore()
 
 onMounted(()=>{
     mermaid.run();
 
+    var scrollTimeout: number | null
     window.addEventListener('scroll',()=>{
         var scrollHeight = document.documentElement.scrollHeight || document.body.scrollHeight;
-        if(page < 3 && window.scrollY + window.innerHeight >= scrollHeight - 500){
-            github.GetIssues(page++);
+        if(window.scrollY + window.innerHeight >= scrollHeight - 500){
+            
+            if (!scrollTimeout){
+                scrollTimeout = setTimeout(()=>{
+                    scrollTimeout = null
+                    github.GetIssues();
+                },10000)
+            }
         }
 
     },true)
 })
 
-        
-
 onUpdated(() => {
     mermaid.run();
 })
 
-
-const m = useMarkdownStore()
-const github = useGithubStore()
-
-github.GetIssues(page++)
-
-
+github.GetIssues()
 </script>
