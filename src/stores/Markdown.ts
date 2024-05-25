@@ -4,6 +4,7 @@ import { marked } from "marked";
 import hljs from 'highlight.js';
 import { useThemeStore } from '@/stores/Theme';
 import mermaid from "mermaid";
+import { text } from '@fortawesome/fontawesome-svg-core';
 
 mermaid.initialize({
     startOnLoad: true,
@@ -59,12 +60,19 @@ const BlockquoteRenderer = {
     }
 }
 
+const TextRenderer = {
+    text(text:string){
+       return text.replace(/\n/g, '<br>')
+    }
+}
 
 marked.use({renderer: BlockquoteRenderer});
 marked.use({renderer: TableRenderer});
 marked.use({renderer: TableCellRenderer});
 marked.use({renderer: CodeRenderer});
+marked.use({renderer: TextRenderer})
 // marked.use({renderer: CheckboxRenderer});
+
 
 
 

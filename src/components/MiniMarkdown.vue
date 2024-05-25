@@ -4,7 +4,7 @@
 
         <div  :class="'p-3 card-header header-'+theme.GetThemeColor">    
                  <router-link @click="scrollToTop"  :class="'removeA '+theme.GetThemeStyle" :to="{ path: 'markdown/'+props.Markdown.number}">
-                <h5 class="removeMarginBottom">{{props.Markdown.title}} #{{props.Markdown.number}}</h5>
+                <h5 class="removeMarginBottom">{{props.Markdown.title}}</h5>
                  </router-link>
         </div>   
 
