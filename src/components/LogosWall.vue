@@ -89,7 +89,7 @@
     </ul> -->
   </div>
 </template>
-<script></script>
+<script setup lang="ts"></script>
 <style>
 .div-wall {
   height: 1px;

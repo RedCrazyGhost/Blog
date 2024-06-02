@@ -10,12 +10,12 @@ const router = createRouter({
     {
       path: '/home',
       name: 'home',
-      component: () => import('../views/HomeView.vue')
+      component: () => import('@/views/HomeView.vue')
     },
     {
       path: '/image',
       name: 'image',
-      component: () => import('../views/ImageView.vue')
+      component: () => import('@/views/ImageView.vue')
     },
     {
       path:'/markdown',
@@ -24,12 +24,12 @@ const router = createRouter({
     {
       path:'/markdown/:id',
       name: 'markdown',
-      component: () => import('../views/MarkdownView.vue'),    
+      component: () => import('@/views/MarkdownView.vue'),    
     },
     {
       path: '/:pathMatch(.*)*',
       name: '404',
-      component: () => import('../views/404View.vue')
+      component: () => import('@/views/404View.vue')
     },
   ]
 })
