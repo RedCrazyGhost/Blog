@@ -11,6 +11,10 @@
 <script setup lang="ts">
 const props = defineProps(["Tag"])
 
+// todo props.Tag.description 支持更多自定义配置
+// 拆分成数组判断本文前缀，逐一添加选项
+// ["fa-tag", "fa-tags", "css-life", "css-fly"]
+
 </script>
 <style>
 .tag{

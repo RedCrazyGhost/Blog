@@ -20,7 +20,7 @@
       </div>
       <div class="carousel-inner">
         <div
-          :class="'carousel-item ' + (index == 0 ? 'active' : '')"
+          :class="'carousel-item img-fluid ' + (index == 0 ? 'active' : '')"
           v-for="(item, index) in Images"
           :key="'image-' + index"
         >
@@ -82,7 +82,7 @@ const Images = ref([
     path: "/IMG/6.png",
     alt: "函馆山",
     title: "函馆山夜",
-    desc: "",
+    desc: "夜晚的函馆",
   },
   {
     path: "/IMG/7.png",

@@ -41,7 +41,7 @@
 <script setup lang="ts">
 import { RouterLink} from 'vue-router'
 import { useAppStore } from '@/stores/App'
-import TopNavTips from './TopNavTips.vue';
+import TopNavTips from '@/components/TopNavTips.vue';
 import { useThemeStore } from '@/stores/Theme'
 
 const theme = useThemeStore()

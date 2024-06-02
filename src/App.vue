@@ -2,16 +2,16 @@
   <div :class="'container-fluid '+theme.GetThemeStyle" :style={fontFamily:font.GetUseFont}>
     <TopNav />   
 
-    <RouterView id="router-view" style="min-height: calc(100vh - 9.75rem)"/>
-
+    <RouterView id="router-view" style="min-height: calc(100vh - 9.75rem);overflow: hidden;"/>
+    
     <BottomNav />
   </div>
 
 </template> 
 <script setup lang="ts">
 import { RouterView } from 'vue-router'
-import TopNav from "./components/TopNav.vue";
-import BottomNav from './components/BottomNav.vue';
+import TopNav from "@/components/TopNav.vue";
+import BottomNav from '@/components/BottomNav.vue';
 import { useFontStore } from "@/stores/Font";
 import { useThemeStore } from '@/stores/Theme';
 

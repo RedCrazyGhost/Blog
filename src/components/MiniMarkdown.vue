@@ -1,6 +1,6 @@
 <template>
 
-      <div :class="'shadow offset-1 col-10 card card-'+theme.GetThemeColor+' '+theme.GetThemeStyle" style="margin-top: 1.5rem;">
+      <div :class="'shadow card card-'+theme.GetThemeColor+' '+theme.GetThemeStyle" style="margin-top: 1.5rem;">
 
         <div  :class="'p-3 card-header header-'+theme.GetThemeColor">    
                  <router-link @click="scrollToTop"  :class="'removeA '+theme.GetThemeStyle" :to="{ path: 'markdown/'+props.Markdown.number}">
@@ -21,7 +21,7 @@
         </div> 
 
         <div :class="'card-footer footer-'+theme.GetThemeColor" v-if="props.Markdown.labels.length!==0">
-            <MarkdownTag  v-for="tag in Markdown.labels" :key="tag.id" :Tag="tag"/>
+            <Tag  v-for="tag in Markdown.labels" :key="tag.id" :Tag="tag"/>
         </div> 
 
 
@@ -31,7 +31,7 @@
 <script setup lang="ts">
 import { useThemeStore } from '@/stores/Theme';
 import { useMarkdownStore } from '@/stores/Markdown';
-import MarkdownTag from "./MarkdownTag.vue";
+import Tag from "@/components/Tag.vue";
 import { defineProps } from 'vue';
 const theme = useThemeStore();
 const m =useMarkdownStore();

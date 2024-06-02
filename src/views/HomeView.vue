@@ -1,11 +1,17 @@
 <template>
 <div>
-    <MiniMarkdown v-for="item in m.GetMarkdowns" :key="item.title" :Markdown="item"/>
+    <div  class="offset-1 col-10">
+        <MiniMarkdown v-for="item in m.GetMarkdowns" :key="item.title" :Markdown="item"/>
+    </div>
+    <LogosWall />
+
     <Loading v-if="m.GetMarkdowns.length == 0"/>
+
 </div>
 </template>
 
 <script setup lang="ts">
+import LogosWall from '@/components/LogosWall.vue'
 import MiniMarkdown from '@/components/MiniMarkdown.vue';
 import { useGithubStore } from '@/stores/Github'
 import mermaid from 'mermaid';
