@@ -1,6 +1,8 @@
 <template>
-    <div class="offset-md-1 col-10">
-        <Markdown :id="r.params.id"/>
+    <div>
+        <div  class="offset-1 col-10">
+            <Markdown :id="r.params.id"/>
+        </div>
     </div>
 </template>
 <script setup lang="ts">

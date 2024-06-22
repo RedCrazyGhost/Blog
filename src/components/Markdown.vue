@@ -1,8 +1,6 @@
 <template>
-    <div>
         <div v-html="m.parseCurrentMarkdownHTML">
         </div>
-    </div>
 </template>
 <script setup lang="ts">
 import { useMarkdownStore } from "@/stores/Markdown";
