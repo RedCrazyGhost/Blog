@@ -47,9 +47,6 @@ import { useThemeStore } from '@/stores/Theme'
 const theme = useThemeStore()
 const app = useAppStore()
 
-
-
-
 </script>
 
 <style>

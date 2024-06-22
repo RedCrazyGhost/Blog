@@ -4,19 +4,18 @@
         <MiniMarkdown v-for="item in m.GetMarkdowns" :key="item.title" :Markdown="item"/>
     </div>
 
-    <Loading v-if="m.GetMarkdowns.length == 0"/>
+    <LoadingView v-if="m.GetMarkdowns.length == 0"/>
 
 </div>
 </template>
 
 <script setup lang="ts">
-import LogosWall from '@/components/LogosWall.vue'
 import MiniMarkdown from '@/components/MiniMarkdown.vue';
 import { useGithubStore } from '@/stores/Github'
 import mermaid from 'mermaid';
 import { useMarkdownStore } from '@/stores/Markdown'
 import { onMounted, onUpdated } from 'vue';
-import Loading from '@/components/Loading.vue';
+import LoadingView from '@/views/LoadingView.vue';
 
 const m = useMarkdownStore()
 const github = useGithubStore()
