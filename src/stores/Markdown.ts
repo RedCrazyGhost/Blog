@@ -66,16 +66,21 @@ const TextRenderer = {
     }
 }
 
-marked.use({renderer: BlockquoteRenderer});
-marked.use({renderer: TableRenderer});
-marked.use({renderer: TableCellRenderer});
-marked.use({renderer: CodeRenderer});
-marked.use({renderer: TextRenderer})
-// marked.use({renderer: CheckboxRenderer});
+const ImageRenderer = {
+    image(href: string, title: string | null, text: string){
+        title == null ? title = text : title = title
+        return `<img src="${href}" alt="${text}" title="${title}" style="width: 100%;height: auto;" loading="lazy">`
+    }
+}
 
-
-
-
+marked.use(
+    {renderer: BlockquoteRenderer},
+    {renderer: TableRenderer},
+    {renderer: TableCellRenderer},
+    {renderer: CodeRenderer},
+    {renderer: TextRenderer},
+    {renderer: ImageRenderer}
+);
 
 export const useMarkdownStore = defineStore('Markdown',() =>{
     const currentMarkdown = ref()
