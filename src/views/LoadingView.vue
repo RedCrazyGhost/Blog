@@ -1,7 +1,7 @@
 <template>
     <div>
         <Loading  style="min-height: calc(100vh - 9.75rem)"/>
-        <LogosWall />
+        <!-- <LogosWall /> -->
     </div>
 </template>
 <script setup lang="ts">

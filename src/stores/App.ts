@@ -11,7 +11,7 @@ export const useAppStore = defineStore('App', () => {
         name:"RedCrazyGhost"
     })
 
-    const Version = ref("v1.0.7")
+    const Version = ref("v1.0.8")
 
 
 

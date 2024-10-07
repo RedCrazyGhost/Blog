@@ -61,7 +61,6 @@
 import { useThemeStore } from "@/stores/Theme";
 import { useMarkdownStore } from "@/stores/Markdown";
 import Tag from "@/components/Tag.vue";
-import { defineProps } from "vue";
 
 const theme = useThemeStore();
 const m = useMarkdownStore();
