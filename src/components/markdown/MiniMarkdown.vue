@@ -1,31 +1,48 @@
 <template>
-  <div :class="'shadow card card-' + theme.GetThemeColor + ' ' + theme.GetThemeStyle
-    " style="margin-top: 1.5rem">
-    <div :class="'p-3 card-header header-' + theme.GetThemeColor">
+  <div :class="[
+    'mt-6 rounded-lg shadow-md',
+    theme.GetThemeColor === 'light' 
+      ? 'bg-white border border-gray-200' 
+      : 'bg-gray-800 border border-white/10',
+    theme.GetThemeStyle
+  ]">
+    <div :class="[
+      'px-4 py-3 border-b',
+      theme.GetThemeColor === 'light' 
+        ? 'border-gray-200' 
+        : 'bg-white/5 border-white/10'
+    ]">
       <router-link @click="scrollToTop" :class="'removeA ' + theme.GetThemeStyle"
         :to="{ path: 'markdown/' + props.Markdown.number }">
         <h5 class="removeMarginBottom">{{ props.Markdown.title }}</h5>
       </router-link>
     </div>
 
-    <div class="card-body">
+    <div class="px-4 py-4">
       <router-link @click="scrollToTop" :class="'removeA ' + theme.GetThemeStyle"
         :to="{ path: 'markdown/' + props.Markdown.number }">
         <div :id="'miniMD-' + props.Markdown.number" v-html="miniMarkdownHTML"></div>
 
-        <p class="card-text">
-          <small class="text-muted">更多详细内容请单击查看！</small>
+        <p class="mt-1">
+          <small class="text-gray-600">更多详细内容请单击查看！</small>
         </p>
-        <p class="card-text">
-          <small class="text-muted"><font-awesome-icon class="iconTheme" icon="fa-regular fa-calendar-plus" />
+        <p class="mt-1">
+          <small class="text-gray-600"><font-awesome-icon class="iconTheme" icon="fa-regular fa-calendar-plus" />
             {{ formatDate(props.Markdown.created_at) }}</small>
-          <small class="text-muted"><font-awesome-icon class="iconTheme" icon="fa-solid fa-hourglass-half" />
-            {{ formatDate(props.Markdown.updated_at) }}</small>
+          <small v-if="formatDate(props.Markdown.created_at) !== formatDate(props.Markdown.updated_at)" class="text-gray-600 ml-4">
+            <font-awesome-icon class="iconTheme" icon="fa-solid fa-hourglass-half" />
+            {{ formatDate(props.Markdown.updated_at) }}
+          </small>
         </p>
       </router-link>
     </div>
 
-    <div :class="'card-footer footer-' + theme.GetThemeColor" v-if="props.Markdown.labels.length !== 0">
+    <div :class="[
+      'px-4 py-3 border-t',
+      theme.GetThemeColor === 'light' 
+        ? 'border-gray-200' 
+        : 'bg-white/5 border-white/10'
+    ]" v-if="props.Markdown.labels.length !== 0">
       <Tag v-for="tag in Markdown.labels" :key="tag.id" :Tag="tag" />
     </div>
   </div>
@@ -36,7 +53,7 @@ import { formatDate } from "@/utils/date";
 import { useThemeStore } from "@/stores/Theme";
 import { useMarkdownStore } from "@/stores/Markdown";
 import Tag from "@/components/common/Tag.vue";
-import { ref, onMounted, watch, nextTick, onUpdated, onUnmounted } from "vue";
+import { ref, onMounted, watch, nextTick, onUpdated, onUnmounted, computed } from "vue";
 import mermaid from "mermaid";
 import { marked } from "marked";
 import type { Tokens } from "marked";
@@ -49,6 +66,21 @@ const isParsing = ref(false);
 const lastParsedBody = ref<string>("");
 let renderTimer: number | null = null;
 let isRendering = ref(false);
+const windowWidth = ref<number>(typeof window !== 'undefined' ? window.innerWidth : 1024);
+
+// 根据窗口宽度计算最大长度
+const maxLength = computed(() => {
+  // 根据窗口宽度动态调整：小屏幕50，中等屏幕100，大屏幕150
+  if (windowWidth.value < 768) {
+    return 50;
+  } else if (windowWidth.value < 1024) {
+    return 100;
+  } else {
+    return 150;
+  }
+});
+
+const lastMaxLength = ref<number>(maxLength.value);
 
 
 /**
@@ -130,20 +162,21 @@ function MiniBody(str: string, maxLength: number = 50): string {
 }
 
 async function parseMiniMarkdown() {
-  // 防止重复解析相同内容
-  if (isParsing.value || lastParsedBody.value === props.Markdown.body) {
+  // 防止重复解析相同内容（内容未变化且最大长度未变化）
+  if (isParsing.value || (lastParsedBody.value === props.Markdown.body && lastMaxLength.value === maxLength.value)) {
     return;
   }
 
   isParsing.value = true;
   try {
-    const miniBody = MiniBody(props.Markdown.body);
+    const miniBody = MiniBody(props.Markdown.body, maxLength.value);
     const parsed = await m.parseMarkdownHTML(miniBody);
     
     // 只有在内容真正变化时才更新
     if (parsed !== miniMarkdownHTML.value) {
       miniMarkdownHTML.value = parsed;
       lastParsedBody.value = props.Markdown.body;
+      lastMaxLength.value = maxLength.value;
       
       // 等待 DOM 更新后渲染 mermaid
       await nextTick();
@@ -151,6 +184,26 @@ async function parseMiniMarkdown() {
     }
   } finally {
     isParsing.value = false;
+  }
+}
+
+// 窗口大小变化处理函数
+function handleResize() {
+  const newWidth = window.innerWidth;
+  // 计算新的 maxLength
+  let newMaxLength = 50;
+  if (newWidth < 768) {
+    newMaxLength = 50;
+  } else if (newWidth < 1024) {
+    newMaxLength = 100;
+  } else {
+    newMaxLength = 150;
+  }
+  
+  // 只有当 maxLength 发生变化时才更新窗口宽度并重新解析
+  if (newMaxLength !== maxLength.value) {
+    windowWidth.value = newWidth;
+    parseMiniMarkdown();
   }
 }
 
@@ -185,21 +238,36 @@ async function renderMermaid() {
 
 onMounted(() => {
   parseMiniMarkdown();
+  // 监听窗口大小变化
+  window.addEventListener('resize', handleResize, { passive: true });
 });
 
-// 组件卸载时清理定时器
+// 组件卸载时清理定时器和事件监听器
 onUnmounted(() => {
   if (renderTimer !== null) {
     clearTimeout(renderTimer);
     renderTimer = null;
   }
   isRendering.value = false;
+  window.removeEventListener('resize', handleResize);
 });
 
 // 只在内容真正变化时渲染，避免 onUpdated 重复触发
 watch(() => props.Markdown.body, () => {
   parseMiniMarkdown();
 }, { immediate: false });
+
+// 监听窗口宽度变化，重新解析内容
+watch(windowWidth, () => {
+  parseMiniMarkdown();
+});
+
+// 监听主题变化，重新解析 markdown
+watch(() => theme.GetThemeColor, () => {
+  // 主题变化时，强制重新解析（清除缓存）
+  lastParsedBody.value = "";
+  parseMiniMarkdown();
+});
 
 function scrollToTop() {
   window.scrollTo({
@@ -216,26 +284,4 @@ function scrollToTop() {
   text-decoration: none;
 }
 
-.card-dark {
-  border: 1px solid rgba(255, 255, 255, 0.125);
-}
-
-.header-dark {
-  background-color: rgba(255, 255, 255, 0.03);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.125);
-}
-
-.footer-dark {
-  background-color: rgba(255, 255, 255, 0.03);
-  border-top: 1px solid rgba(255, 255, 255, 0.125);
-}
-
-.text-muted {
-  --bs-text-opacity: 1;
-  color: #6c757d !important;
-}
-
-.text-muted+.text-muted {
-  margin-left: 1rem;
-}
 </style>

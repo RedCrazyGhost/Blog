@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div class="offset-1 col-10">
+        <div class="max-w-5xl mx-auto px-4">
             <MiniMarkdown v-for="item in m.GetMarkdowns" :key="item.title" :Markdown="item" />
         </div>
         <LoadingView v-if="m.GetMarkdowns.length == 0" />

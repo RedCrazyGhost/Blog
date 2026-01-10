@@ -1,9 +1,19 @@
-import { ref, computed } from "vue";
+import { ref, computed, watch } from "vue";
 import { defineStore } from "pinia";
 
 export interface ThemeColor {
   FontColor: string;
   BackgroundColor: string;
+}
+
+// 更新 HTML 根元素的 dark class
+function updateHtmlDarkClass(isDark: boolean) {
+  const htmlElement = document.documentElement;
+  if (isDark) {
+    htmlElement.classList.add('dark');
+  } else {
+    htmlElement.classList.remove('dark');
+  }
 }
 
 export const useThemeStore = defineStore("Theme", () => {
@@ -12,15 +22,30 @@ export const useThemeStore = defineStore("Theme", () => {
     BackgroundColor: "light",
   });
 
+  // 初始化时设置 dark class
+  if (typeof document !== 'undefined') {
+    updateHtmlDarkClass(Theme.value.BackgroundColor === 'dark');
+  }
+
   function SetThemeLight() {
     Theme.value.FontColor = "dark";
     Theme.value.BackgroundColor = "light";
+    updateHtmlDarkClass(false);
   }
 
   function SetThemeDark() {
     Theme.value.FontColor = "light";
     Theme.value.BackgroundColor = "dark";
+    updateHtmlDarkClass(true);
   }
+
+  // 监听主题变化，同步更新 HTML dark class
+  watch(
+    () => Theme.value.BackgroundColor,
+    (newColor) => {
+      updateHtmlDarkClass(newColor === 'dark');
+    }
+  );
 
   const GetThemeStyle = computed(
     () => `bg-${Theme.value.BackgroundColor} text-${Theme.value.FontColor}`

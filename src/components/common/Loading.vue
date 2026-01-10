@@ -1,5 +1,5 @@
 <template>
-  <div class="container d-flex align-items-center justify-content-center">
+  <div class="container mx-auto px-4 flex items-center justify-center min-h-[60vh]">
     <font-awesome-icon :icon="['fas', 'rotate']" size="8x" spin />
   </div>
 </template>

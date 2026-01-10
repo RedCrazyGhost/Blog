@@ -1,11 +1,8 @@
-import "../node_modules/bootstrap/dist/css/bootstrap.min.css";
-import "bootstrap";
+import "@/assets/css/tailwind.css";
 import "@/assets/css/github.css";
 
 import { createApp } from "vue";
 import { createPinia } from "pinia";
-
-import { Image } from "ant-design-vue";
 
 import { library } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
@@ -22,7 +19,6 @@ const app = createApp(App);
 
 app.use(createPinia());
 app.use(router);
-app.use(Image);
 
 app.component("font-awesome-icon", FontAwesomeIcon);
 

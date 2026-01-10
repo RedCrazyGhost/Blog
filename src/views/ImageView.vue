@@ -1,13 +1,22 @@
 <template>
-  <div class="image-gallery-container">
+  <div :class="'image-gallery-container ' + theme.GetBackgroundColorStyle">
     <div v-for="(images, country) in groupedByCountry" :key="country" class="gallery-section">
       <!-- 标题栏 -->
-      <div :class="'section-header header-' + getCountryColor(country)">
+      <div :class="'section-header header-' + getCountryClassName(country)">
         <h1 class="section-title">{{ country }}</h1>
+        <!-- 樱花花瓣（仅日本） -->
+        <template v-if="getCountryClassName(country) === 'japan'">
+          <span class="sakura-petal sakura-1"></span>
+          <span class="sakura-petal sakura-2"></span>
+          <span class="sakura-petal sakura-3"></span>
+          <span class="sakura-petal sakura-4"></span>
+          <span class="sakura-petal sakura-5"></span>
+          <span class="sakura-petal sakura-6"></span>
+        </template>
       </div>
       
       <!-- 内容区域 -->
-      <div class="gallery-content">
+      <div :class="'gallery-content gallery-content-' + theme.GetThemeColor">
         <div 
           class="gallery-scroll-wrapper"
           :ref="el => setScrollRef(country, el as HTMLElement | null)"
@@ -15,7 +24,7 @@
           <!-- 左侧渐变遮罩 -->
           <div 
             class="scroll-fade scroll-fade-left"
-            :class="{ 'fade-hidden': getScrollState(country).isAtStart }"
+            :class="{ 'fade-hidden': getScrollState(country).isAtStart, 'scroll-fade-dark': theme.GetThemeColor === 'dark' }"
           ></div>
           
           <div 
@@ -33,9 +42,11 @@
                 <img 
                   v-show="!item.isLoading"
                   @load="LoadingDone(item, index, country)"
-                  :src="CDN.getURL(item.path)" 
+                  @error="LoadingError(item, index, country)"
+                  :src="item.shouldLoad ? CDN.getURL(item.path) : ''" 
+                  :data-src="CDN.getURL(item.path)"
                   :alt="item.alt"
-                  loading="lazy"
+                  :ref="el => setImageRef(item, el as HTMLImageElement | null)"
                 />
               <div class="thumbnail-overlay">
                 <div class="thumbnail-info">
@@ -50,7 +61,7 @@
           <!-- 右侧渐变遮罩 -->
           <div 
             class="scroll-fade scroll-fade-right"
-            :class="{ 'fade-hidden': getScrollState(country).isAtEnd }"
+            :class="{ 'fade-hidden': getScrollState(country).isAtEnd, 'scroll-fade-dark': theme.GetThemeColor === 'dark' }"
           ></div>
           
           <!-- 左侧导航按钮 -->
@@ -122,13 +133,25 @@
 
 <script setup lang="ts">
 import { useCDNStore } from "@/stores/CDN";
-import { ref, computed, nextTick, onUnmounted } from "vue";
+import { useThemeStore } from "@/stores/Theme";
+import { ref, computed, nextTick, onMounted, onUnmounted } from "vue";
 import Loading from "@/components/common/Loading.vue";
 import type { ImageItem } from "@/types/image";
 
 const CDN = useCDNStore();
+const theme = useThemeStore();
 
-const Images = ref<ImageItem[]>([
+// 扩展 ImageItem 类型以支持懒加载
+interface ExtendedImageItem extends ImageItem {
+  shouldLoad?: boolean;
+}
+
+// 图片元素引用映射
+const imageRefs = ref<Map<ImageItem, HTMLImageElement>>(new Map());
+// Intersection Observer 实例
+let imageObserver: IntersectionObserver | null = null;
+
+const Images = ref<ExtendedImageItem[]>([
   {
     path: "/IMG/1.png",
     alt: "江之岛拍摄的富士山",
@@ -136,6 +159,7 @@ const Images = ref<ImageItem[]>([
     desc: "江之岛拍摄的富士山",
     country: "日本",
     isLoading: true,
+    shouldLoad: false,
   },
   {
     path: "/IMG/2.png",
@@ -144,6 +168,7 @@ const Images = ref<ImageItem[]>([
     desc: "夜晚的七里滨",
     country: "日本",
     isLoading: true,
+    shouldLoad: false,
   },
   {
     path: "/IMG/3.png",
@@ -152,6 +177,7 @@ const Images = ref<ImageItem[]>([
     desc: "",
     country: "日本",
     isLoading: true,
+    shouldLoad: false,
   },
   {
     path: "/IMG/4.png",
@@ -160,6 +186,7 @@ const Images = ref<ImageItem[]>([
     desc: "",
     country: "日本",
     isLoading: true,
+    shouldLoad: false,
   },
   {
     path: "/IMG/5.png",
@@ -168,6 +195,7 @@ const Images = ref<ImageItem[]>([
     desc: "",
     country: "日本",
     isLoading: true,
+    shouldLoad: false,
   },
   {
     path: "/IMG/6.png",
@@ -176,6 +204,7 @@ const Images = ref<ImageItem[]>([
     desc: "夜晚的函馆",
     country: "日本",
     isLoading: false,
+    shouldLoad: false,
   },
   {
     path: "/IMG/7.png",
@@ -184,6 +213,7 @@ const Images = ref<ImageItem[]>([
     desc: "",
     country: "日本",
     isLoading: true,
+    shouldLoad: false,
   },
   {
     path: "/IMG/8.png",
@@ -192,6 +222,7 @@ const Images = ref<ImageItem[]>([
     desc: "五棱郭",
     country: "日本",
     isLoading: true,
+    shouldLoad: false,
   },
 ]);
 
@@ -343,21 +374,93 @@ function scrollRight(country: string) {
   }
 }
 
-// 获取国家对应的颜色类
-function getCountryColor(country: string): string {
-  const colorMap: Record<string, string> = {
-    '日本': 'yellow',
-    '中国': 'red',
-    '美国': 'blue',
-    '法国': 'blue',
-    '意大利': 'green',
+// 将中文国家名转换为英文类名
+function getCountryClassName(country: string): string {
+  const nameMap: Record<string, string> = {
+    '日本': 'japan',
+    '中国': 'china',
+    '美国': 'usa',
+    '法国': 'france',
+    '意大利': 'italy',
   };
-  return colorMap[country] || 'grey';
+  return nameMap[country] || 'default';
+}
+
+// 设置图片元素引用
+function setImageRef(item: ExtendedImageItem, el: HTMLImageElement | null) {
+  if (el) {
+    imageRefs.value.set(item, el);
+    // 如果 Observer 已创建，立即观察这个元素
+    if (imageObserver) {
+      imageObserver.observe(el);
+    }
+  } else {
+    // 元素被移除时，取消观察
+    const img = imageRefs.value.get(item);
+    if (img && imageObserver) {
+      imageObserver.unobserve(img);
+    }
+    imageRefs.value.delete(item);
+  }
+}
+
+// 初始化 Intersection Observer
+function initImageObserver() {
+  if (typeof IntersectionObserver === 'undefined') {
+    // 浏览器不支持 Intersection Observer，直接加载所有图片
+    Images.value.forEach(item => {
+      item.shouldLoad = true;
+    });
+    return;
+  }
+
+  imageObserver = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          const img = entry.target as HTMLImageElement;
+          
+          // 找到对应的图片项
+          for (const [item, imgElement] of imageRefs.value.entries()) {
+            if (imgElement === img) {
+              if (!item.shouldLoad) {
+                // 设置 shouldLoad 为 true，Vue 会自动更新 src 属性
+                item.shouldLoad = true;
+              }
+              // 图片开始加载后，取消观察
+              imageObserver?.unobserve(img);
+              break;
+            }
+          }
+        }
+      });
+    },
+    {
+      root: null, // 使用视口作为根
+      rootMargin: '50px', // 提前 50px 开始加载
+      threshold: 0.01, // 只要有一点可见就触发
+    }
+  );
+
+  // 观察所有已存在的图片元素
+  nextTick(() => {
+    imageRefs.value.forEach((img) => {
+      if (img && !img.src) {
+        imageObserver?.observe(img);
+      }
+    });
+  });
 }
 
 // 图片加载完成
-function LoadingDone(item: ImageItem, index: number, country: string) {
+function LoadingDone(item: ExtendedImageItem, index: number, country: string) {
   item.isLoading = false;
+}
+
+function LoadingError(item: ExtendedImageItem, index: number, country: string) {
+  // 图片加载失败时也停止加载动画
+  item.isLoading = false;
+  console.error(`图片加载失败: ${CDN.getURL(item.path)}`);
 }
 
 // 图片模态框
@@ -400,7 +503,33 @@ function closeFullscreen() {
   document.body.style.overflow = '';
 }
 
-// 组件卸载时清理所有定时器
+// 组件挂载后初始化图片观察器
+onMounted(() => {
+  initImageObserver();
+  
+  // 立即检查前几张图片是否已经在视口中（初始可见的图片）
+  nextTick(() => {
+    imageRefs.value.forEach((img, item) => {
+      if (img && !item.shouldLoad) {
+        // 使用 getBoundingClientRect 检查是否在视口中
+        const rect = img.getBoundingClientRect();
+        const isVisible = rect.top < window.innerHeight + 50 && 
+                         rect.bottom > -50 && 
+                         rect.left < window.innerWidth + 50 && 
+                         rect.right > -50;
+        
+        if (isVisible) {
+          item.shouldLoad = true;
+          if (imageObserver) {
+            imageObserver.unobserve(img);
+          }
+        }
+      }
+    });
+  });
+});
+
+// 组件卸载时清理所有定时器和观察器
 onUnmounted(() => {
   // 清理滚动防抖定时器
   Object.values(scrollTimers.value).forEach((timer) => {
@@ -416,20 +545,37 @@ onUnmounted(() => {
     }
   });
   
+  // 清理 Intersection Observer
+  if (imageObserver) {
+    imageRefs.value.forEach((img) => {
+      imageObserver?.unobserve(img);
+    });
+    imageObserver.disconnect();
+    imageObserver = null;
+  }
+  
   // 清理滚动状态和引用
   scrollRefs.value = {};
   scrollStates.value = {};
   scrollTimers.value = {};
   scrollButtonTimers.value = {};
   initializedCountries.value.clear();
+  imageRefs.value.clear();
 });
 </script>
 
 <style scoped>
 .image-gallery-container {
   padding: 2rem 1rem;
-  background: var(--bs-body-bg, #f5f5f5);
   min-height: calc(100vh - 9.75rem);
+}
+
+.image-gallery-container.bg-light {
+  background: #f5f5f5;
+}
+
+.image-gallery-container.bg-dark {
+  background: #212529;
 }
 
 .gallery-section {
@@ -448,20 +594,180 @@ onUnmounted(() => {
   align-items: center;
   justify-content: space-between;
   overflow: hidden;
+  margin-bottom: 0;
+  box-shadow: 
+    0 -2px 8px rgba(0,0,0,0.1),
+    -2px 0 8px rgba(0,0,0,0.1),
+    2px 0 8px rgba(0,0,0,0.1);
+}
+
+.bg-dark .section-header {
+  box-shadow: 
+    0 -2px 8px rgba(0,0,0,0.3),
+    -2px 0 8px rgba(0,0,0,0.3),
+    2px 0 8px rgba(0,0,0,0.3);
 }
 
 /* 日本风格 - 樱花粉渐变 + 樱花飘落动画 */
-.header-yellow {
+.header-japan {
   background: linear-gradient(135deg, #ff6b9d 0%, #ffb3d1 50%, #ffd6e8 100%);
-  background-image: 
-    radial-gradient(circle at 20% 50%, rgba(255, 182, 193, 0.3) 0%, transparent 50%),
-    radial-gradient(circle at 80% 50%, rgba(255, 192, 203, 0.3) 0%, transparent 50%);
   position: relative;
   overflow: hidden;
 }
 
+/* 樱花花瓣样式 */
+.sakura-petal {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 50% 0 50% 0;
+  pointer-events: none;
+  z-index: 1;
+  top: -20px;
+}
+
+/* 每个花瓣的不同位置和动画 */
+.sakura-1 {
+  left: 10%;
+  animation: sakura-fall-1 8s infinite linear;
+}
+
+.sakura-2 {
+  left: 25%;
+  animation: sakura-fall-2 10s infinite linear;
+  animation-delay: 1s;
+}
+
+.sakura-3 {
+  left: 40%;
+  animation: sakura-fall-3 9s infinite linear;
+  animation-delay: 2s;
+}
+
+.sakura-4 {
+  left: 55%;
+  animation: sakura-fall-1 11s infinite linear;
+  animation-delay: 0.5s;
+}
+
+.sakura-5 {
+  left: 70%;
+  animation: sakura-fall-2 9.5s infinite linear;
+  animation-delay: 1.5s;
+}
+
+.sakura-6 {
+  left: 85%;
+  animation: sakura-fall-3 10.5s infinite linear;
+  animation-delay: 2.5s;
+}
+
+/* 樱花飘落动画 - 使用伪元素创建多个花瓣（旧代码，将被新代码覆盖） */
+.header-japan::before,
+.header-japan::after {
+  content: '';
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 50% 0 50% 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.header-japan::before {
+  left: 10%;
+  top: -20px;
+  animation: sakura-fall-1 8s infinite linear;
+  box-shadow: 
+    200px 0 0 rgba(255, 255, 255, 0.7),
+    400px 0 0 rgba(255, 255, 255, 0.6),
+    600px 0 0 rgba(255, 255, 255, 0.8),
+    800px 0 0 rgba(255, 255, 255, 0.7);
+}
+
+.header-japan::after {
+  left: 20%;
+  top: -20px;
+  animation: sakura-fall-2 10s infinite linear;
+  animation-delay: 1s;
+  box-shadow: 
+    150px 0 0 rgba(255, 255, 255, 0.6),
+    350px 0 0 rgba(255, 255, 255, 0.7),
+    550px 0 0 rgba(255, 255, 255, 0.5),
+    750px 0 0 rgba(255, 255, 255, 0.6);
+}
+
+/* 使用标题的伪元素创建更多花瓣 */
+.header-japan .section-title::before {
+  content: '';
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 50% 0 50% 0;
+  left: -50px;
+  top: -20px;
+  pointer-events: none;
+  z-index: 1;
+  animation: sakura-fall-3 12s infinite linear;
+  animation-delay: 2s;
+  box-shadow: 
+    100px 0 0 rgba(255, 255, 255, 0.5),
+    250px 0 0 rgba(255, 255, 255, 0.6),
+    450px 0 0 rgba(255, 255, 255, 0.7),
+    650px 0 0 rgba(255, 255, 255, 0.5);
+}
+
+/* 樱花飘落动画 - 不同的路径和速度 */
+@keyframes sakura-fall-1 {
+  0% {
+    transform: translateY(-50px) translateX(0) rotate(0deg);
+    opacity: 1;
+  }
+  50% {
+    transform: translateY(150px) translateX(30px) rotate(180deg);
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateY(300px) translateX(-20px) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+@keyframes sakura-fall-2 {
+  0% {
+    transform: translateY(-50px) translateX(0) rotate(0deg);
+    opacity: 1;
+  }
+  50% {
+    transform: translateY(180px) translateX(-40px) rotate(180deg);
+    opacity: 0.7;
+  }
+  100% {
+    transform: translateY(350px) translateX(50px) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+@keyframes sakura-fall-3 {
+  0% {
+    transform: translateY(-50px) translateX(0) rotate(0deg);
+    opacity: 1;
+  }
+  50% {
+    transform: translateY(200px) translateX(25px) rotate(180deg);
+    opacity: 0.6;
+  }
+  100% {
+    transform: translateY(400px) translateX(-35px) rotate(360deg);
+    opacity: 0;
+  }
+}
+
 /* 中国风格 - 红色渐变 */
-.header-red {
+.header-china {
   background: linear-gradient(135deg, #c8102e 0%, #dc143c 50%, #ff1744 100%);
   background-image: 
     radial-gradient(circle at 30% 40%, rgba(255, 215, 0, 0.2) 0%, transparent 40%),
@@ -475,7 +781,7 @@ onUnmounted(() => {
 }
 
 /* 美国风格 - 蓝白条纹 */
-.header-blue {
+.header-usa {
   background: linear-gradient(135deg, #002868 0%, #0033a0 50%, #1e3a8a 100%);
   background-image: 
     repeating-linear-gradient(
@@ -495,7 +801,7 @@ onUnmounted(() => {
 }
 
 /* 法国风格 - 蓝白红三色 */
-.header-green {
+.header-france {
   background: linear-gradient(135deg, #002654 0%, #0055a4 33%, #ffffff 33%, #ffffff 66%, #ef4135 66%, #ed2939 100%);
   background-image: 
     repeating-linear-gradient(
@@ -508,7 +814,7 @@ onUnmounted(() => {
 }
 
 /* 意大利风格 - 绿白红三色 */
-.header-grey {
+.header-italy {
   background: linear-gradient(135deg, #009246 0%, #ffffff 33%, #ffffff 66%, #ce2b37 66%, #ce2b37 100%);
   background-image: 
     repeating-linear-gradient(
@@ -518,6 +824,11 @@ onUnmounted(() => {
       rgba(0,0,0,0.05) 10px,
       rgba(0,0,0,0.05) 20px
     );
+}
+
+/* 默认风格 */
+.header-default {
+  background: linear-gradient(135deg, #6c757d 0%, #495057 50%, #343a40 100%);
 }
 
 .section-title {
@@ -533,10 +844,27 @@ onUnmounted(() => {
 /* 内容区域 */
 .gallery-content {
   position: relative;
-  background: var(--bs-body-bg, white);
   border-radius: 0 0 12px 12px;
   padding: 1.5rem;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  margin-top: 0;
+  /* 只保留下方、左侧和右侧的阴影，移除上方阴影 */
+  box-shadow: 
+    0 2px 8px rgba(0,0,0,0.1),
+    -2px 0 8px rgba(0,0,0,0.1),
+    2px 0 8px rgba(0,0,0,0.1);
+}
+
+.gallery-content-light {
+  background: white;
+}
+
+.gallery-content-dark {
+  background: #2d333b;
+  /* 只保留下方、左侧和右侧的阴影，移除上方阴影 */
+  box-shadow: 
+    0 2px 8px rgba(0,0,0,0.3),
+    -2px 0 8px rgba(0,0,0,0.3),
+    2px 0 8px rgba(0,0,0,0.3);
 }
 
 .gallery-scroll-wrapper {
@@ -570,12 +898,20 @@ onUnmounted(() => {
 
 .scroll-fade-left {
   left: 0;
-  background: linear-gradient(to right, var(--bs-body-bg, white), transparent);
+  background: linear-gradient(to right, white, transparent);
 }
 
 .scroll-fade-right {
   right: 0;
-  background: linear-gradient(to left, var(--bs-body-bg, white), transparent);
+  background: linear-gradient(to left, white, transparent);
+}
+
+.scroll-fade-left.scroll-fade-dark {
+  background: linear-gradient(to right, #2d333b, transparent);
+}
+
+.scroll-fade-right.scroll-fade-dark {
+  background: linear-gradient(to left, #2d333b, transparent);
 }
 
 /* 隐藏渐变遮罩 */
@@ -602,6 +938,11 @@ onUnmounted(() => {
   aspect-ratio: 16/9;
   background: #f0f0f0;
   box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.bg-dark .thumbnail-wrapper {
+  background: #1a1d21;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
 }
 
 .thumbnail-wrapper img {
@@ -682,6 +1023,19 @@ onUnmounted(() => {
   background: rgba(240, 240, 240, 1);
   border-color: rgba(220, 220, 220, 1);
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3), 0 0 0 2px rgba(255, 255, 255, 0.5);
+}
+
+.bg-dark .nav-btn {
+  border: 2px solid rgba(45, 51, 59, 0.9);
+  background: rgba(45, 51, 59, 0.95);
+  color: #e9ecef;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+.bg-dark .nav-btn:hover {
+  background: rgba(60, 67, 77, 1);
+  border-color: rgba(80, 87, 97, 1);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), 0 0 0 2px rgba(45, 51, 59, 0.5);
 }
 
 .nav-btn svg {

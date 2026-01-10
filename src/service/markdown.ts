@@ -18,7 +18,7 @@ marked.use(
 export class MarkdownService {
   async parseHTML(markdown: string): Promise<string> {
     try {
-      return await marked.parse(markdown);
+      return marked(markdown);
     } catch (error) {
       logger.error("Error parsing markdown:", error);
       return "Error parsing markdown content";

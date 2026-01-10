@@ -1,10 +1,11 @@
-import { ref, computed } from "vue";
+import { ref, computed, watch } from "vue";
 import { defineStore } from "pinia";
 import { marked } from "marked";
 import mermaid from "mermaid";
 import type { MarkdownContent } from "@/types/markdown";
 import type { GithubIssue } from "@/types/github";
 import { MarkdownService } from "@/service/markdown";
+import { useThemeStore } from "@/stores/Theme";
 
 mermaid.initialize({
   startOnLoad: true,
@@ -17,6 +18,7 @@ export const useMarkdownStore = defineStore("Markdown", () => {
   const Markdowns = ref<MarkdownContent[]>([]);
   const parsedHTML = ref<string>("");
   const isParsing = ref(false);
+  const theme = useThemeStore();
 
   function SetCurrentMarkdown(data: GithubIssue | null) {
     currentMarkdown.value = data;
@@ -79,6 +81,16 @@ export const useMarkdownStore = defineStore("Markdown", () => {
   const GetCurrentMarkdown = computed(() => {
     return currentMarkdown.value;
   });
+
+  // 监听主题变化，重新解析当前 markdown
+  watch(
+    () => theme.GetThemeColor,
+    () => {
+      if (currentMarkdown.value && currentMarkdown.value.body) {
+        parseMarkdownAsync(currentMarkdown.value.body);
+      }
+    }
+  );
 
   return {
     SetCurrentMarkdown,

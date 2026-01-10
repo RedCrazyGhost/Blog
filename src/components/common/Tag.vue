@@ -1,5 +1,5 @@
 <template>
-  <span :class="'tag badge ' + tagStyle" :style="{ backgroundColor: '#' + props.Tag.color }">
+  <span :class="'tag inline-block px-2 py-1 text-xs font-semibold rounded text-white ' + tagStyle" :style="{ backgroundColor: '#' + props.Tag.color }">
     <font-awesome-icon class="iconTheme" :icon="iconStyle" />
     {{ props.Tag.name }}
   </span>

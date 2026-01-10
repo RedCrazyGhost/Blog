@@ -23,7 +23,6 @@ export default defineConfig({
         // 代码分割优化
         manualChunks: {
           'vendor-vue': ['vue', 'vue-router', 'pinia'],
-          'vendor-ui': ['bootstrap', 'ant-design-vue'],
           'vendor-markdown': ['marked', 'mermaid'],
           'vendor-github': ['octokit'],
           'vendor-icons': [

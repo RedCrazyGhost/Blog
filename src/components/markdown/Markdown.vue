@@ -1,5 +1,5 @@
 <template>
-    <div v-html="m.parseCurrentMarkdownHTML"></div>
+    <div class="markdown-content" v-html="m.parseCurrentMarkdownHTML"></div>
 </template>
 <script setup lang="ts">
 import { useMarkdownStore } from "@/stores/Markdown";
