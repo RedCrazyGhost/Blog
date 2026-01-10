@@ -406,7 +406,7 @@ onUnmounted(() => {
   Object.values(scrollTimers.value).forEach((timer) => {
     if (timer !== undefined) {
       clearTimeout(timer);
-    }
+}
   });
   
   // 清理滚动按钮定时器

@@ -57,7 +57,7 @@ export const useFontStore = defineStore("Font", () => {
         }
       );
 
-      document.fonts.add(font);
+    document.fonts.add(font);
 
       // 创建超时 Promise
       const timeoutPromise = new Promise<never>((_, reject) => {
@@ -69,7 +69,7 @@ export const useFontStore = defineStore("Font", () => {
       // 加载字体（带超时）
       await Promise.race([font.load(), timeoutPromise]);
 
-      Font.value.useFont = Font.value.fontFamilyName;
+        Font.value.useFont = Font.value.fontFamilyName;
       Font.value.status = 'success';
       logger.log('字体加载成功:', Font.value.fontFamilyName);
     } catch (error) {

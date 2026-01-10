@@ -21,10 +21,10 @@ export class GithubService {
   async getIssue(id: number, forceRefresh: boolean = false): Promise<GithubIssue> {
     // 如果强制刷新，跳过缓存
     if (!forceRefresh) {
-      const cachedIssue = cache.get(String(id));
-      if (cachedIssue) {
-        return cachedIssue as GithubIssue;
-      }
+    const cachedIssue = cache.get(String(id));
+    if (cachedIssue) {
+      return cachedIssue as GithubIssue;
+    }
     }
     
     // 从 API 获取最新数据

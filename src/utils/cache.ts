@@ -56,12 +56,12 @@ export class Cache<T> {
   }
 
   set(key: string, value: T) {
-    this.cache[key] = {
-      data: value,
-      timestamp: Date.now(),
-    };
-    this.saveToLocalStorage();
-  }
+      this.cache[key] = {
+        data: value,
+        timestamp: Date.now(),
+      };
+      this.saveToLocalStorage();
+    }
 
   /**
    * 更新已存在的缓存项
