@@ -5,4 +5,5 @@ export interface ImageItem {
   desc: string;
   country: string;
   isLoading: boolean;
+  shouldLoad?: boolean;
 }

@@ -10,9 +10,9 @@ export class AppError extends Error {
   ) {
     super(message);
     this.name = 'AppError';
-    // 保持堆栈跟踪
-    if (Error.captureStackTrace) {
-      Error.captureStackTrace(this, AppError);
+    // 保持堆栈跟踪 (V8/Node.js specific)
+    if (typeof (Error as any).captureStackTrace === 'function') {
+      (Error as any).captureStackTrace(this, AppError);
     }
   }
 }
