@@ -10,7 +10,7 @@ export const config = {
     apiBaseUrl: import.meta.env.VITE_GITHUB_API_BASE_URL || 'https://api.github.com',
   },
   app: {
-    version: import.meta.env.VITE_APP_VERSION || 'v1.0.9',
+    version: import.meta.env.VITE_APP_VERSION || 'v1.0.10',
     author: {
       name: import.meta.env.VITE_APP_AUTHOR_NAME || 'RedCrazyGhost',
     },
