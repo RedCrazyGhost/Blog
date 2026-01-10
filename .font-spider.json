@@ -1,0 +1,16 @@
+{
+  "ignore": [
+    "node_modules/**/*",
+    "src/**/*",
+    "*.json",
+    "*.md",
+    "*.ts",
+    "*.vue"
+  ],
+  "map": [
+    [
+      "dist/fonts/*.ttf"
+    ]
+  ],
+  "log": false
+}

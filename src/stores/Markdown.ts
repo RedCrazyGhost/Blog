@@ -1,145 +1,91 @@
-import { ref, computed } from 'vue'
-import { defineStore } from 'pinia'
+import { ref, computed } from "vue";
+import { defineStore } from "pinia";
 import { marked } from "marked";
-import hljs from 'highlight.js';
-import { useThemeStore } from '@/stores/Theme';
 import mermaid from "mermaid";
-import { text } from '@fortawesome/fontawesome-svg-core';
+import type { MarkdownContent } from "@/types/markdown";
+import type { GithubIssue } from "@/types/github";
+import { MarkdownService } from "@/service/markdown";
 
 mermaid.initialize({
-    startOnLoad: true,
-})
+  startOnLoad: true,
+});
 
+const markdownService = new MarkdownService();
 
-const theme = useThemeStore()
+export const useMarkdownStore = defineStore("Markdown", () => {
+  const currentMarkdown = ref<GithubIssue | null>(null);
+  const Markdowns = ref<MarkdownContent[]>([]);
+  const parsedHTML = ref<string>("");
+  const isParsing = ref(false);
 
+  function SetCurrentMarkdown(data: GithubIssue | null) {
+    currentMarkdown.value = data;
+    // 异步解析 markdown
+    if (data && data.body) {
+      parseMarkdownAsync(data.body);
+    } else {
+      parsedHTML.value = "";
+    }
+  }
 
-// const CheckboxRenderer = {
-//     checkbox(checked: boolean){        
-//         return `<input type="checkbox" disabled ${checked ? "checked" : ""} />`
-//     }
-// }
+  async function parseMarkdownAsync(markdownBody: string) {
+    if (isParsing.value) return;
+    isParsing.value = true;
+    try {
+      parsedHTML.value = await markdownService.parseHTML(markdownBody);
+    } catch (error) {
+      parsedHTML.value = "解析 Markdown 时出错";
+    } finally {
+      isParsing.value = false;
+    }
+  }
 
-const CodeRenderer = {
-    code(code: string, infostring: string | undefined, escaped: boolean){
-        switch(infostring){
-            case "":
-                return ""
-            case "mysql":
-            case "MySQL":
-            case "MYSQL":
-                return `<pre class="language-mysql pre-${theme.GetThemeColor}"><code class="language-mysql">${hljs.highlight(code, {language: "sql", ignoreIllegals: escaped }).value}</code></pre>`
-            case "Mermaid":
-            case "mermaid":
-                return `<pre class="mermaid">${code}</pre>`
-            default:
-                return `<pre class="language-${infostring} pre-${theme.GetThemeColor}"><code class="language-${infostring}">${hljs.highlight(code, {language: String(infostring), ignoreIllegals: escaped }).value}</code></pre>`
+  // 二分查找插入，如果存在则直接获取
+  function AddMarkdown(data: MarkdownContent) {
+    const len = Markdowns.value.length;
+    if (len == 0) {
+      Markdowns.value.push(data);
+    } else {
+      let left = 0,
+        right = len - 1,
+        ans = len;
+      while (left <= right) {
+        let mid = ((right - left) >> 1) + left;
+        if (data.number > Markdowns.value[mid].number) {
+          ans = mid;
+          right = mid - 1;
+        } else if (data.number == Markdowns.value[mid].number) {
+          return;
+        } else {
+          left = mid + 1;
         }
+      }
+      Markdowns.value.splice(ans, 0, data);
     }
-}
-const TableRenderer ={
-    table(header:string,body:string){
-        return `<div class="table-responsive">
-        <table class="table table-hover align-middle ${theme.GetTableColor}">
-        <thead class="thead-${theme.GetThemeColor}">${header}</thead>
-        <tbody>${body}</tbody>
-        </table>
-        </div>`
-    }
-}
-const TableCellRenderer ={
-    tablecell(content:string,flags:any){
-        const tag = flags.header ? "th" : "td"
-        return `<${tag} class="text-center">${content}</${tag}>`
-    }
-}
+  }
 
-const BlockquoteRenderer = {
-    blockquote(quote:string){        
-        return `<blockquote class="bd-callout bd-callout-${theme.GetThemeColor}">${quote}</blockquote>`
-    }
-}
+  const parseCurrentMarkdownHTML = computed(() => {
+    return parsedHTML.value;
+  });
 
-const TextRenderer = {
-    text(text:string){
-       return text.replace(/\n/g, '<br>')
-    }
-}
+  async function parseMarkdownHTML(markdownBody: string): Promise<string> {
+    return await markdownService.parseHTML(markdownBody);
+  }
 
-const ImageRenderer = {
-    image(href: string, title: string | null, text: string){
-        title == null ? title = text : title = title
-        return `<img src="${href}" alt="${text}" title="${title}" style="width: 100%;height: auto;" loading="lazy">`
-    }
-}
-
-marked.use(
-    {renderer: BlockquoteRenderer},
-    {renderer: TableRenderer},
-    {renderer: TableCellRenderer},
-    {renderer: CodeRenderer},
-    {renderer: TextRenderer},
-    {renderer: ImageRenderer}
-);
-
-export const useMarkdownStore = defineStore('Markdown',() =>{
-    const currentMarkdown = ref()
-    const Markdowns = ref([] as any[])
-
-    function SetCurrentMarkdown(data: any){
-        currentMarkdown.value=data
-    }
-
-    // 二分查找插入，如果存在则直接获取
-    function AddMarkdown(data: any){
-        const len = Markdowns.value.length;
-        if (len == 0){
-            Markdowns.value.push(data)
-        }else{
-
-            let left = 0,right = len-1 ,ans = len;
-            while(left <= right ) {
-                let mid = ((right-left)>>1)+left;
-                if (data.number > Markdowns.value[mid].number){
-                    ans = mid;
-                    right = mid -1;
-                }else if(data.number == Markdowns.value[mid].number){
-                    return
-                }else{
-                    left = mid +1;
-                }
-            }
-            Markdowns.value.splice(ans,0,data)
-        }
-    }
-
-    const parseCurrentMarkdownHTML = computed(() => {
-        if(typeof(currentMarkdown.value) === 'object'){
-            return marked.parse(currentMarkdown.value.body)
-        }else{
-            return ''
-        }
-      })
-    
-      const parseMarkdownHTML = computed(() => {
-        return (markdownBody:string)=>{
-            return marked.parse(markdownBody)
-        }
-      })
-
-
-
-    const GetMarkdowns = computed(() => {
-        return Markdowns.value
-      })
+  const GetMarkdowns = computed(() => {
+    return Markdowns.value;
+  });
 
   const GetCurrentMarkdown = computed(() => {
-        return currentMarkdown.value
-      })
+    return currentMarkdown.value;
+  });
 
-    return {
-        SetCurrentMarkdown,AddMarkdown,
-        GetMarkdowns,GetCurrentMarkdown,
-        parseMarkdownHTML,parseCurrentMarkdownHTML
-    }
-})
+  return {
+    SetCurrentMarkdown,
+    AddMarkdown,
+    GetMarkdowns,
+    GetCurrentMarkdown,
+    parseMarkdownHTML,
+    parseCurrentMarkdownHTML,
+  };
+});
