@@ -1,37 +1,37 @@
 <template>
-  <div :class="'container-fluid '+theme.GetThemeStyle" :style={fontFamily:font.GetUseFont}>
-    <TopNav />   
+  <div :class="'container-fluid ' + theme.GetThemeStyle" :style="{ fontFamily: font.GetUseFont }">
+    <TopNav />
 
-    <RouterView id="router-view" style="min-height: calc(100vh - 9.75rem);overflow: hidden;"/>
-    
+    <RouterView id=" router-view" style="min-height: calc(100vh - 9.75rem);overflow: hidden;" />
+
     <BottomNav />
   </div>
 
-</template> 
+</template>
 <script setup lang="ts">
 import { RouterView } from 'vue-router'
-import TopNav from "@/components/TopNav.vue";
-import BottomNav from '@/components/BottomNav.vue';
+import TopNav from "@/components/layout/TopNav.vue";
+import BottomNav from '@/components/layout/BottomNav.vue';
 import { useFontStore } from "@/stores/Font";
 import { useThemeStore } from '@/stores/Theme';
 
-const theme= useThemeStore()
-const  font  = useFontStore()
+const theme = useThemeStore()
+const font = useFontStore()
 font.LoadFont()
 
 </script>
 <style>
 pre[class*='language-']::before {
-    content: '';
-    position: absolute;
-    top: 9px;
-    left: 15px;
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    background: #fc625d;
-    box-shadow: 20px 0 #fdbc40, 40px 0 #35cd4b;
-    z-index: 1;
+  content: '';
+  position: absolute;
+  top: 9px;
+  left: 15px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #fc625d;
+  box-shadow: 20px 0 #fdbc40, 40px 0 #35cd4b;
+  z-index: 1;
 }
 
 pre[class*='language-'] {
@@ -41,10 +41,11 @@ pre[class*='language-'] {
 }
 
 .pre-light {
-    background-color: #f6f8fa;
+  background-color: #f6f8fa;
 }
+
 .pre-dark {
-    background-color: #2d333b;
+  background-color: #2d333b;
 }
 
 .bg-light {
@@ -58,18 +59,19 @@ pre[class*='language-'] {
 .thead-light {
   border-bottom: 2px #000 solid;
 }
-.thead-dark{
+
+.thead-dark {
   border-bottom: 2px #fff solid;
 }
 
 
 .bd-callout {
-    padding: 1.25rem;
-    margin-top: 1.25rem;
-    margin-bottom: 1.25rem;
-    border: 1px solid #e9ecef;
-    border-left-width: 0.25rem;
-    border-radius: 0.25rem;
+  padding: 1.25rem;
+  margin-top: 1.25rem;
+  margin-bottom: 1.25rem;
+  border: 1px solid #e9ecef;
+  border-left-width: 0.25rem;
+  border-radius: 0.25rem;
 }
 
 .bd-callout-light {
@@ -81,16 +83,18 @@ pre[class*='language-'] {
 }
 
 .bd-callout+.bd-callout {
-    margin-top: -0.25rem;
+  margin-top: -0.25rem;
 }
 
-.bd-callout > p {
+.bd-callout>p {
   margin-bottom: 0px;
 }
 
-.bd-callout > p + p {
+.bd-callout>p+p {
   margin-top: 1rem;
 }
 
-a{text-decoration:none}
+a {
+  text-decoration: none
+}
 </style>

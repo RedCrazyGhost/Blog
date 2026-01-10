@@ -1,53 +1,60 @@
-import { ref, computed } from 'vue'
-import { defineStore } from 'pinia'
+import { ref, computed } from "vue";
+import { defineStore } from "pinia";
 
+export interface ThemeColor {
+  FontColor: string;
+  BackgroundColor: string;
+}
 
-export const useThemeStore = defineStore('Theme', () => {
-    const Theme = ref({
-        FontColor: "dark",
-        BackgroundColor: "light"
-      })
+export const useThemeStore = defineStore("Theme", () => {
+  const Theme = ref<ThemeColor>({
+    FontColor: "dark",
+    BackgroundColor: "light",
+  });
 
-      function SetThemeLight() {
-        Theme.value.FontColor = "dark"
-        Theme.value.BackgroundColor = "light"
-      }
-      function SetThemeDark() {
-        Theme.value.FontColor = "light"
-        Theme.value.BackgroundColor = "dark"
-      }
+  function SetThemeLight() {
+    Theme.value.FontColor = "dark";
+    Theme.value.BackgroundColor = "light";
+  }
 
-      const GetThemeStyle = computed(() => {
-        return "bg-"+Theme.value.BackgroundColor+" text-"+Theme.value.FontColor
-      })
-      const GetThemeColor = computed(() => {
-        return Theme.value.BackgroundColor
-      })
+  function SetThemeDark() {
+    Theme.value.FontColor = "light";
+    Theme.value.BackgroundColor = "dark";
+  }
 
-      const GetBackgroundColorStyle = computed(() => {
-        return "bg-"+Theme.value.BackgroundColor
-      })
-      const GetFontColorStyle = computed(() => {
-        return "text-"+Theme.value.FontColor
-      })
-      const GetNavbarStyle = computed(() => {
-        return "navbar-"+Theme.value.BackgroundColor
-      })
+  const GetThemeStyle = computed(
+    () => `bg-${Theme.value.BackgroundColor} text-${Theme.value.FontColor}`
+  );
 
-      const GetTableColor = computed(() => {
-        return  Theme.value.BackgroundColor === "light" ? "" : "table-dark"
-      })
+  const GetThemeColor = computed(() => Theme.value.BackgroundColor);
 
-      function SwitchTheme() {
-        if (Theme.value.BackgroundColor == "light") {
-          SetThemeDark()
-        } else {
-          SetThemeLight()
-        }
-      }
-    return {
-      GetThemeColor,GetBackgroundColorStyle,GetFontColorStyle,GetNavbarStyle,
-      GetThemeStyle,GetTableColor,
-        SetThemeLight,SetThemeDark,SwitchTheme
-    }
-})
+  const GetBackgroundColorStyle = computed(
+    () => `bg-${Theme.value.BackgroundColor}`
+  );
+
+  const GetFontColorStyle = computed(() => `text-${Theme.value.FontColor}`);
+
+  const GetNavbarStyle = computed(
+    () => `navbar-${Theme.value.BackgroundColor}`
+  );
+
+  const GetTableColor = computed(() =>
+    Theme.value.BackgroundColor === "light" ? "" : "table-dark"
+  );
+
+  function SwitchTheme() {
+    Theme.value.BackgroundColor === "light" ? SetThemeDark() : SetThemeLight();
+  }
+
+  return {
+    GetThemeColor,
+    GetBackgroundColorStyle,
+    GetFontColorStyle,
+    GetNavbarStyle,
+    GetThemeStyle,
+    GetTableColor,
+    SetThemeLight,
+    SetThemeDark,
+    SwitchTheme,
+  };
+});

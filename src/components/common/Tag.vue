@@ -1,8 +1,5 @@
 <template>
-  <span
-    :class="'tag badge ' + tagStyle"
-    :style="{ backgroundColor: '#' + props.Tag.color }"
-  >
+  <span :class="'tag badge ' + tagStyle" :style="{ backgroundColor: '#' + props.Tag.color }">
     <font-awesome-icon class="iconTheme" :icon="iconStyle" />
     {{ props.Tag.name }}
   </span>
@@ -26,6 +23,7 @@ props.Tag.description.split(" ").forEach((element: string) => {
 .tag {
   margin-right: 6px;
 }
+
 /* .tag-rainbow {
   background: linear-gradient(
       217deg,
@@ -36,10 +34,10 @@ props.Tag.description.split(" ").forEach((element: string) => {
     linear-gradient(336deg, rgba(0, 0, 255, 0.8), rgba(0, 0, 255, 0) 70.71%) !important;
 } */
 .tag-gradual {
-    background: 
-    linear-gradient(45deg, rgba(255, 156, 0, 0.9) 0%, rgba(255, 156, 0, 0) 50%), 
-    linear-gradient(135deg, rgba(0, 191, 255, 0.9) 50%, rgba(0, 191, 255, 0) 100%), 
-    linear-gradient(225deg, rgba(128, 0, 128, 0.9) 0%, rgba(128, 0, 128, 0) 50%), 
+  background:
+    linear-gradient(45deg, rgba(255, 156, 0, 0.9) 0%, rgba(255, 156, 0, 0) 50%),
+    linear-gradient(135deg, rgba(0, 191, 255, 0.9) 50%, rgba(0, 191, 255, 0) 100%),
+    linear-gradient(225deg, rgba(128, 0, 128, 0.9) 0%, rgba(128, 0, 128, 0) 50%),
     linear-gradient(315deg, rgba(255, 255, 0, 0.9) 50%, rgba(255, 255, 0, 0) 100%);
   background-size: 400% 400%;
   background-position: left top;
@@ -50,15 +48,13 @@ props.Tag.description.split(" ").forEach((element: string) => {
   0% {
     background-position: left center;
   }
+
   50% {
     background-position: right center;
   }
+
   100% {
     background-position: left center;
   }
-}
-
-.tag-test{
-    
 }
 </style>
