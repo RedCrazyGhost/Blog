@@ -1,91 +1,32 @@
 <template>
   <div :class="'image-gallery-container ' + theme.GetBackgroundColorStyle">
-    <div v-for="(images, country) in groupedByCountry" :key="country" class="gallery-section">
-      <!-- 标题栏 -->
-      <div :class="'section-header header-' + getCountryClassName(country)">
-        <h1 class="section-title">{{ country }}</h1>
-        <!-- 樱花花瓣（仅日本） -->
-        <template v-if="getCountryClassName(country) === 'japan'">
-          <span class="sakura-petal sakura-1"></span>
-          <span class="sakura-petal sakura-2"></span>
-          <span class="sakura-petal sakura-3"></span>
-          <span class="sakura-petal sakura-4"></span>
-          <span class="sakura-petal sakura-5"></span>
-          <span class="sakura-petal sakura-6"></span>
-        </template>
-      </div>
-      
-      <!-- 内容区域 -->
-      <div :class="'gallery-content gallery-content-' + theme.GetThemeColor">
-        <div 
-          class="gallery-scroll-wrapper"
-          :ref="el => setScrollRef(country, el as HTMLElement | null)"
-        >
-          <!-- 左侧渐变遮罩 -->
-          <div 
-            class="scroll-fade scroll-fade-left"
-            :class="{ 'fade-hidden': getScrollState(country).isAtStart, 'scroll-fade-dark': theme.GetThemeColor === 'dark' }"
-          ></div>
-          
-          <div 
-            class="gallery-scroll" 
-            @scroll="handleScroll(country)"
-          >
-            <div 
-              class="gallery-item" 
-              v-for="(item, index) in images" 
-              :key="'image-' + country + '-' + index"
-              @click="openFullscreen(item)"
-            >
-              <div class="thumbnail-wrapper">
-                <Loading v-if="item.isLoading" class="thumbnail-loading" />
-                <img 
-                  v-show="!item.isLoading"
-                  @load="LoadingDone(item, index, country)"
-                  @error="LoadingError(item, index, country)"
-                  :src="item.shouldLoad ? CDN.getURL(item.path) : ''" 
-                  :data-src="CDN.getURL(item.path)"
-                  :alt="item.alt"
-                  :ref="el => setImageRef(item, el as HTMLImageElement | null)"
-                />
-              <div class="thumbnail-overlay">
-                <div class="thumbnail-info">
-              <h5>{{ item.title }}</h5>
-                  <p v-if="item.desc">{{ item.desc }}</p>
-                </div>
-              </div>
-              </div>
-            </div>
-          </div>
-          
-          <!-- 右侧渐变遮罩 -->
-          <div 
-            class="scroll-fade scroll-fade-right"
-            :class="{ 'fade-hidden': getScrollState(country).isAtEnd, 'scroll-fade-dark': theme.GetThemeColor === 'dark' }"
-          ></div>
-          
-          <!-- 左侧导航按钮 -->
-          <button 
-            class="nav-btn nav-btn-left"
-            :class="{ 'btn-hidden': getScrollState(country).isAtStart }"
-            @click="scrollLeft(country)"
-            :aria-label="'向左滚动 ' + country + ' 的图片'"
-          >
-            <font-awesome-icon icon="fas fa-chevron-left" />
-          </button>
-          
-          <!-- 右侧导航按钮 -->
-          <button 
-            class="nav-btn nav-btn-right"
-            :class="{ 'btn-hidden': getScrollState(country).isAtEnd }"
-            @click="scrollRight(country)"
-            :aria-label="'向右滚动 ' + country + ' 的图片'"
-          >
-            <font-awesome-icon icon="fas fa-chevron-right" />
-          </button>
-        </div>
-      </div>
-    </div>
+    <!-- 地图组件 -->
+    <ImageMap 
+      :images="Images"
+      :grouped-images="groupedByCountry"
+      :gallery-ids="galleryIds"
+    />
+    
+    <!-- 图片画廊组件 -->
+    <HorizontalImageGallery
+      v-for="(images, country) in groupedByCountry"
+      :key="country"
+      :images="images"
+      :title="country"
+      :title-class="'header-' + getCountryClassName(country)"
+      :gallery-id="galleryIds[country]"
+      @image-click="openFullscreen"
+    >
+      <!-- 樱花花瓣插槽（仅日本） -->
+      <template v-if="getCountryClassName(country) === 'japan'" #header-extra>
+        <span class="sakura-petal sakura-1"></span>
+        <span class="sakura-petal sakura-2"></span>
+        <span class="sakura-petal sakura-3"></span>
+        <span class="sakura-petal sakura-4"></span>
+        <span class="sakura-petal sakura-5"></span>
+        <span class="sakura-petal sakura-6"></span>
+      </template>
+    </HorizontalImageGallery>
 
     <!-- 图片模态框 -->
     <div v-if="selectedImage" class="image-modal" @click="closeImageModal">
@@ -134,8 +75,9 @@
 <script setup lang="ts">
 import { useCDNStore } from "@/stores/CDN";
 import { useThemeStore } from "@/stores/Theme";
-import { ref, computed, nextTick, onMounted, onUnmounted } from "vue";
-import Loading from "@/components/common/Loading.vue";
+import { ref, computed } from "vue";
+import HorizontalImageGallery from "@/components/image/HorizontalImageGallery.vue";
+import ImageMap from "@/components/image/ImageMap.vue";
 import type { ImageItem } from "@/types/image";
 
 const CDN = useCDNStore();
@@ -146,11 +88,6 @@ interface ExtendedImageItem extends ImageItem {
   shouldLoad?: boolean;
 }
 
-// 图片元素引用映射
-const imageRefs = ref<Map<ImageItem, HTMLImageElement>>(new Map());
-// Intersection Observer 实例
-let imageObserver: IntersectionObserver | null = null;
-
 const Images = ref<ExtendedImageItem[]>([
   {
     path: "/IMG/1.png",
@@ -160,6 +97,12 @@ const Images = ref<ExtendedImageItem[]>([
     country: "日本",
     isLoading: true,
     shouldLoad: false,
+    location: {
+      lat: 35.2971,
+      lng: 139.4833,
+      city: "江之岛",
+      province: "神奈川县"
+    }
   },
   {
     path: "/IMG/2.png",
@@ -169,6 +112,12 @@ const Images = ref<ExtendedImageItem[]>([
     country: "日本",
     isLoading: true,
     shouldLoad: false,
+    location: {
+      lat: 35.3089,
+      lng: 139.5203,
+      city: "七里滨",
+      province: "神奈川县"
+    }
   },
   {
     path: "/IMG/3.png",
@@ -178,6 +127,12 @@ const Images = ref<ExtendedImageItem[]>([
     country: "日本",
     isLoading: true,
     shouldLoad: false,
+    location: {
+      lat: 34.9949,
+      lng: 135.7850,
+      city: "京都",
+      province: "京都府"
+    }
   },
   {
     path: "/IMG/4.png",
@@ -187,6 +142,12 @@ const Images = ref<ExtendedImageItem[]>([
     country: "日本",
     isLoading: true,
     shouldLoad: false,
+    location: {
+      lat: 35.0116,
+      lng: 135.7681,
+      city: "京都",
+      province: "京都府"
+    }
   },
   {
     path: "/IMG/5.png",
@@ -196,6 +157,12 @@ const Images = ref<ExtendedImageItem[]>([
     country: "日本",
     isLoading: true,
     shouldLoad: false,
+    location: {
+      lat: 34.6851,
+      lng: 135.8400,
+      city: "奈良",
+      province: "奈良县"
+    }
   },
   {
     path: "/IMG/6.png",
@@ -205,6 +172,12 @@ const Images = ref<ExtendedImageItem[]>([
     country: "日本",
     isLoading: false,
     shouldLoad: false,
+    location: {
+      lat: 41.7688,
+      lng: 140.7289,
+      city: "函馆",
+      province: "北海道"
+    }
   },
   {
     path: "/IMG/7.png",
@@ -214,6 +187,12 @@ const Images = ref<ExtendedImageItem[]>([
     country: "日本",
     isLoading: true,
     shouldLoad: false,
+    location: {
+      lat: 41.7970,
+      lng: 140.7565,
+      city: "函馆",
+      province: "北海道"
+    }
   },
   {
     path: "/IMG/8.png",
@@ -223,6 +202,12 @@ const Images = ref<ExtendedImageItem[]>([
     country: "日本",
     isLoading: true,
     shouldLoad: false,
+    location: {
+      lat: 41.7970,
+      lng: 140.7565,
+      city: "函馆",
+      province: "北海道"
+    }
   },
 ]);
 
@@ -238,141 +223,15 @@ const groupedByCountry = computed(() => {
   return grouped;
 });
 
-// 滚动容器引用
-const scrollRefs = ref<Record<string, HTMLElement | null>>({});
-// 滚动状态
-const scrollStates = ref<Record<string, { isAtStart: boolean; isAtEnd: boolean }>>({});
-// 滚动防抖定时器
-const scrollTimers = ref<Record<string, number | undefined>>({});
-// 滚动按钮的定时器
-const scrollButtonTimers = ref<Record<string, number | undefined>>({});
-// 记录已初始化的国家，避免重复初始化
-const initializedCountries = ref<Set<string>>(new Set());
-
-function setScrollRef(country: string, el: HTMLElement | null) {
-  if (el) {
-    // 查找内部的 gallery-scroll 元素作为实际滚动容器
-    const scrollElement = (el as HTMLElement).querySelector('.gallery-scroll') as HTMLElement;
-    if (scrollElement) {
-      // 避免重复设置相同的滚动元素
-      if (scrollRefs.value[country] === scrollElement) {
-        return;
-      }
-      
-      scrollRefs.value[country] = scrollElement;
-      
-      // 只在首次初始化时设置状态和检查位置
-      if (!initializedCountries.value.has(country)) {
-        initializedCountries.value.add(country);
-        // 初始化滚动状态
-        scrollStates.value[country] = { isAtStart: true, isAtEnd: false };
-        
-        // 初始检查滚动位置（延迟执行，避免在渲染过程中触发更新）
-        nextTick(() => {
-          // 再次检查元素是否仍然存在，避免在卸载后执行
-          if (scrollRefs.value[country] === scrollElement && scrollElement.parentNode) {
-            checkScrollPosition(country, scrollElement);
-          }
-        });
-      }
-    } else {
-      // 如果找不到，使用 wrapper 本身
-      if (scrollRefs.value[country] !== el) {
-        scrollRefs.value[country] = el as HTMLElement;
-      }
-    }
-  } else {
-    // 元素被卸载时清理引用
-    if (scrollRefs.value[country]) {
-      initializedCountries.value.delete(country);
-      delete scrollRefs.value[country];
-    }
-  }
-}
-
-// 检查滚动位置
-function checkScrollPosition(country: string, element: HTMLElement) {
-  // 检查元素是否仍然有效
-  if (!element || !element.parentNode) {
-    return;
-  }
-  
-  const scrollLeft = element.scrollLeft;
-  const scrollWidth = element.scrollWidth;
-  const clientWidth = element.clientWidth;
-  const threshold = 5; // 容差，避免浮点数精度问题
-
-  const isAtStart = scrollLeft <= threshold;
-  const isAtEnd = scrollLeft + clientWidth >= scrollWidth - threshold;
-
-  // 只有在状态真正改变时才更新，避免不必要的响应式更新
-  const currentState = scrollStates.value[country];
-  if (!currentState || currentState.isAtStart !== isAtStart || currentState.isAtEnd !== isAtEnd) {
-    scrollStates.value[country] = { isAtStart, isAtEnd };
-  }
-}
-
-// 处理滚动事件（使用防抖优化性能）
-function handleScroll(country: string) {
-  const scrollElement = scrollRefs.value[country];
-  if (scrollElement) {
-    // 清除之前的定时器
-    if (scrollTimers.value[country]) {
-      clearTimeout(scrollTimers.value[country]);
-    }
-    // 立即检查一次（用于快速响应）
-    checkScrollPosition(country, scrollElement);
-    // 设置防抖定时器，滚动结束后再检查一次（确保准确）
-    scrollTimers.value[country] = window.setTimeout(() => {
-      checkScrollPosition(country, scrollElement);
-      scrollTimers.value[country] = undefined;
-    }, 100);
-  }
-}
-
-// 获取滚动状态
-function getScrollState(country: string) {
-  return scrollStates.value[country] || { isAtStart: true, isAtEnd: false };
-}
-
-// 滚动控制
-function scrollLeft(country: string) {
-  const scrollRef = scrollRefs.value[country];
-  if (scrollRef) {
-    // 清除之前的定时器
-    if (scrollButtonTimers.value[country]) {
-      clearTimeout(scrollButtonTimers.value[country]);
-    }
-    
-    scrollRef.scrollBy({ left: -400, behavior: 'smooth' });
-    // 平滑滚动完成后检查位置（使用 requestAnimationFrame 确保更准确）
-    requestAnimationFrame(() => {
-      scrollButtonTimers.value[country] = window.setTimeout(() => {
-        checkScrollPosition(country, scrollRef);
-        scrollButtonTimers.value[country] = undefined;
-      }, 400);
-    });
-  }
-}
-
-function scrollRight(country: string) {
-  const scrollRef = scrollRefs.value[country];
-  if (scrollRef) {
-    // 清除之前的定时器
-    if (scrollButtonTimers.value[country]) {
-      clearTimeout(scrollButtonTimers.value[country]);
-    }
-    
-    scrollRef.scrollBy({ left: 400, behavior: 'smooth' });
-    // 平滑滚动完成后检查位置（使用 requestAnimationFrame 确保更准确）
-    requestAnimationFrame(() => {
-      scrollButtonTimers.value[country] = window.setTimeout(() => {
-        checkScrollPosition(country, scrollRef);
-        scrollButtonTimers.value[country] = undefined;
-      }, 400);
-    });
-  }
-}
+// 生成每个国家对应的图片框 ID（用于地图跳转）
+const galleryIds = computed(() => {
+  const ids: Record<string, string> = {};
+  Object.keys(groupedByCountry.value).forEach((country) => {
+    // 使用国家名生成唯一 ID
+    ids[country] = `gallery-${country}`;
+  });
+  return ids;
+});
 
 // 将中文国家名转换为英文类名
 function getCountryClassName(country: string): string {
@@ -386,82 +245,6 @@ function getCountryClassName(country: string): string {
   return nameMap[country] || 'default';
 }
 
-// 设置图片元素引用
-function setImageRef(item: ExtendedImageItem, el: HTMLImageElement | null) {
-  if (el) {
-    imageRefs.value.set(item, el);
-    // 如果 Observer 已创建，立即观察这个元素
-    if (imageObserver) {
-      imageObserver.observe(el);
-    }
-  } else {
-    // 元素被移除时，取消观察
-    const img = imageRefs.value.get(item);
-    if (img && imageObserver) {
-      imageObserver.unobserve(img);
-    }
-    imageRefs.value.delete(item);
-  }
-}
-
-// 初始化 Intersection Observer
-function initImageObserver() {
-  if (typeof IntersectionObserver === 'undefined') {
-    // 浏览器不支持 Intersection Observer，直接加载所有图片
-    Images.value.forEach(item => {
-      item.shouldLoad = true;
-    });
-    return;
-  }
-
-  imageObserver = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          const img = entry.target as HTMLImageElement;
-          
-          // 找到对应的图片项
-          for (const [item, imgElement] of imageRefs.value.entries()) {
-            if (imgElement === img) {
-              if (!item.shouldLoad) {
-                // 设置 shouldLoad 为 true，Vue 会自动更新 src 属性
-                item.shouldLoad = true;
-              }
-              // 图片开始加载后，取消观察
-              imageObserver?.unobserve(img);
-              break;
-            }
-          }
-        }
-      });
-    },
-    {
-      root: null, // 使用视口作为根
-      rootMargin: '50px', // 提前 50px 开始加载
-      threshold: 0.01, // 只要有一点可见就触发
-    }
-  );
-
-  // 观察所有已存在的图片元素
-  nextTick(() => {
-    imageRefs.value.forEach((img) => {
-      if (img && !img.src) {
-        imageObserver?.observe(img);
-      }
-    });
-  });
-}
-
-// 图片加载完成
-function LoadingDone(item: ExtendedImageItem, index: number, country: string) {
-  item.isLoading = false;
-}
-
-function LoadingError(item: ExtendedImageItem, index: number, country: string) {
-  // 图片加载失败时也停止加载动画
-  item.isLoading = false;
-  console.error(`图片加载失败: ${CDN.getURL(item.path)}`);
-}
 
 // 图片模态框
 const selectedImage = ref<ImageItem | null>(null);
@@ -503,70 +286,10 @@ function closeFullscreen() {
   document.body.style.overflow = '';
 }
 
-// 组件挂载后初始化图片观察器
-onMounted(() => {
-  initImageObserver();
-  
-  // 立即检查前几张图片是否已经在视口中（初始可见的图片）
-  nextTick(() => {
-    imageRefs.value.forEach((img, item) => {
-      if (img && !item.shouldLoad) {
-        // 使用 getBoundingClientRect 检查是否在视口中
-        const rect = img.getBoundingClientRect();
-        const isVisible = rect.top < window.innerHeight + 50 && 
-                         rect.bottom > -50 && 
-                         rect.left < window.innerWidth + 50 && 
-                         rect.right > -50;
-        
-        if (isVisible) {
-          item.shouldLoad = true;
-          if (imageObserver) {
-            imageObserver.unobserve(img);
-          }
-        }
-      }
-    });
-  });
-});
-
-// 组件卸载时清理所有定时器和观察器
-onUnmounted(() => {
-  // 清理滚动防抖定时器
-  Object.values(scrollTimers.value).forEach((timer) => {
-    if (timer !== undefined) {
-      clearTimeout(timer);
-}
-  });
-  
-  // 清理滚动按钮定时器
-  Object.values(scrollButtonTimers.value).forEach((timer) => {
-    if (timer !== undefined) {
-      clearTimeout(timer);
-    }
-  });
-  
-  // 清理 Intersection Observer
-  if (imageObserver) {
-    imageRefs.value.forEach((img) => {
-      imageObserver?.unobserve(img);
-    });
-    imageObserver.disconnect();
-    imageObserver = null;
-  }
-  
-  // 清理滚动状态和引用
-  scrollRefs.value = {};
-  scrollStates.value = {};
-  scrollTimers.value = {};
-  scrollButtonTimers.value = {};
-  initializedCountries.value.clear();
-  imageRefs.value.clear();
-});
 </script>
 
 <style scoped>
 .image-gallery-container {
-  padding: 2rem 1rem;
   min-height: calc(100vh - 9.75rem);
 }
 
@@ -576,36 +299,6 @@ onUnmounted(() => {
 
 .image-gallery-container.bg-dark {
   background: #212529;
-}
-
-.gallery-section {
-  margin-bottom: 3rem;
-  max-width: 1400px;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-/* 标题栏 */
-.section-header {
-  position: relative;
-  padding: 1rem 1.5rem;
-  border-radius: 12px 12px 0 0;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  overflow: hidden;
-  margin-bottom: 0;
-  box-shadow: 
-    0 -2px 8px rgba(0,0,0,0.1),
-    -2px 0 8px rgba(0,0,0,0.1),
-    2px 0 8px rgba(0,0,0,0.1);
-}
-
-.bg-dark .section-header {
-  box-shadow: 
-    0 -2px 8px rgba(0,0,0,0.3),
-    -2px 0 8px rgba(0,0,0,0.3),
-    2px 0 8px rgba(0,0,0,0.3);
 }
 
 /* 日本风格 - 樱花粉渐变 + 樱花飘落动画 */
@@ -831,223 +524,6 @@ onUnmounted(() => {
   background: linear-gradient(135deg, #6c757d 0%, #495057 50%, #343a40 100%);
 }
 
-.section-title {
-  color: white;
-  font-size: 2rem;
-  font-weight: bold;
-  margin: 0;
-  text-shadow: 0 2px 4px rgba(0,0,0,0.2);
-  position: relative;
-  z-index: 2;
-}
-
-/* 内容区域 */
-.gallery-content {
-  position: relative;
-  border-radius: 0 0 12px 12px;
-  padding: 1.5rem;
-  margin-top: 0;
-  /* 只保留下方、左侧和右侧的阴影，移除上方阴影 */
-  box-shadow: 
-    0 2px 8px rgba(0,0,0,0.1),
-    -2px 0 8px rgba(0,0,0,0.1),
-    2px 0 8px rgba(0,0,0,0.1);
-}
-
-.gallery-content-light {
-  background: white;
-}
-
-.gallery-content-dark {
-  background: #2d333b;
-  /* 只保留下方、左侧和右侧的阴影，移除上方阴影 */
-  box-shadow: 
-    0 2px 8px rgba(0,0,0,0.3),
-    -2px 0 8px rgba(0,0,0,0.3),
-    2px 0 8px rgba(0,0,0,0.3);
-}
-
-.gallery-scroll-wrapper {
-  position: relative;
-  width: 100%;
-}
-
-.gallery-scroll {
-  display: flex;
-  gap: 1rem;
-  overflow-x: auto;
-  scroll-behavior: smooth;
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* IE/Edge */
-  padding: 0.5rem 0;
-}
-
-.gallery-scroll::-webkit-scrollbar {
-  display: none; /* Chrome/Safari */
-}
-
-/* 渐变遮罩 */
-.scroll-fade {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  width: 80px;
-  pointer-events: none;
-  z-index: 2;
-}
-
-.scroll-fade-left {
-  left: 0;
-  background: linear-gradient(to right, white, transparent);
-}
-
-.scroll-fade-right {
-  right: 0;
-  background: linear-gradient(to left, white, transparent);
-}
-
-.scroll-fade-left.scroll-fade-dark {
-  background: linear-gradient(to right, #2d333b, transparent);
-}
-
-.scroll-fade-right.scroll-fade-dark {
-  background: linear-gradient(to left, #2d333b, transparent);
-}
-
-/* 隐藏渐变遮罩 */
-.scroll-fade.fade-hidden {
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.gallery-item {
-  flex-shrink: 0;
-  width: 380px;
-  cursor: pointer;
-  transition: transform 0.2s;
-}
-
-.gallery-item:hover {
-  transform: translateY(-4px);
-}
-
-.thumbnail-wrapper {
-  position: relative;
-  border-radius: 12px;
-  overflow: hidden;
-  aspect-ratio: 16/9;
-  background: #f0f0f0;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-}
-
-.bg-dark .thumbnail-wrapper {
-  background: #1a1d21;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-}
-
-.thumbnail-wrapper img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-
-.thumbnail-loading {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-}
-
-.thumbnail-overlay {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
-  padding: 1rem;
-  opacity: 0;
-  transition: opacity 0.3s;
-}
-
-.gallery-item:hover .thumbnail-overlay {
-  opacity: 1;
-}
-
-.thumbnail-info {
-  color: white;
-}
-
-.thumbnail-info h5 {
-  margin: 0 0 0.25rem 0;
-  font-size: 1rem;
-  font-weight: bold;
-}
-
-.thumbnail-info p {
-  margin: 0;
-  font-size: 0.875rem;
-  opacity: 0.9;
-}
-
-/* 导航按钮 */
-.nav-btn {
-  position: absolute;
-  top: 50%;
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  border: 2px solid rgba(255, 255, 255, 0.9);
-  background: rgba(255, 255, 255, 0.95);
-  color: #333;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background-color 0.3s, border-color 0.3s, box-shadow 0.3s;
-  z-index: 3;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-}
-
-.nav-btn-left {
-  left: -24px;
-  transform: translate(-50%, -50%);
-}
-
-.nav-btn-right {
-  right: -24px;
-  transform: translate(50%, -50%);
-}
-
-.nav-btn:hover {
-  background: rgba(240, 240, 240, 1);
-  border-color: rgba(220, 220, 220, 1);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3), 0 0 0 2px rgba(255, 255, 255, 0.5);
-}
-
-.bg-dark .nav-btn {
-  border: 2px solid rgba(45, 51, 59, 0.9);
-  background: rgba(45, 51, 59, 0.95);
-  color: #e9ecef;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
-}
-
-.bg-dark .nav-btn:hover {
-  background: rgba(60, 67, 77, 1);
-  border-color: rgba(80, 87, 97, 1);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), 0 0 0 2px rgba(45, 51, 59, 0.5);
-}
-
-.nav-btn svg {
-  font-size: 1rem;
-}
-
-/* 隐藏导航按钮 */
-.nav-btn.btn-hidden {
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.3s ease;
-}
 
 /* 图片模态框 */
 .image-modal {
