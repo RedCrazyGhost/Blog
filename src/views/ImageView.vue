@@ -301,16 +301,16 @@ function onMapMarkerClick(image: ImageItem) {
     };
 
     scrollEndCleanup = () => {
-      window.removeEventListener("scroll", onScrollEnd, { passive: true });
-      galleryScrollEl.removeEventListener("scroll", onScrollEnd, { passive: true });
+      window.removeEventListener("scroll", onScrollEnd, { passive: true } as AddEventListenerOptions);
+      galleryScrollEl.removeEventListener("scroll", onScrollEnd, { passive: true } as AddEventListenerOptions);
       if (scrollEndTimeoutId) {
         clearTimeout(scrollEndTimeoutId);
         scrollEndTimeoutId = null;
       }
     };
 
-    window.addEventListener("scroll", onScrollEnd, { passive: true });
-    galleryScrollEl.addEventListener("scroll", onScrollEnd, { passive: true });
+    window.addEventListener("scroll", onScrollEnd, { passive: true } as AddEventListenerOptions);
+    galleryScrollEl.addEventListener("scroll", onScrollEnd, { passive: true } as AddEventListenerOptions);
     onScrollEnd();
   });
 }
