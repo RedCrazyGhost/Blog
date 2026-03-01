@@ -5,6 +5,7 @@
       :images="Images"
       :grouped-images="groupedByCountry"
       :gallery-ids="galleryIds"
+      @marker-click="onMapMarkerClick"
     />
     
     <!-- 图片画廊组件 -->
@@ -75,7 +76,7 @@
 <script setup lang="ts">
 import { useCDNStore } from "@/stores/CDN";
 import { useThemeStore } from "@/stores/Theme";
-import { ref, computed } from "vue";
+import { ref, computed, nextTick } from "vue";
 import HorizontalImageGallery from "@/components/image/HorizontalImageGallery.vue";
 import ImageMap from "@/components/image/ImageMap.vue";
 import type { ImageItem } from "@/types/image";
@@ -232,6 +233,87 @@ const galleryIds = computed(() => {
   });
   return ids;
 });
+
+// 地图标记点击：滚动结束检测与 gallery 高亮（使用与悬浮一致的样式，持续 3s）
+const SCROLL_END_DEBOUNCE_MS = 150;
+const GALLERY_HOVER_HIGHLIGHT_MS = 3000;
+
+let galleryHighlightTimeoutId: ReturnType<typeof setTimeout> | null = null;
+let scrollEndTimeoutId: ReturnType<typeof setTimeout> | null = null;
+let scrollEndCleanup: (() => void) | null = null;
+let lastHighlightedOverlay: HTMLElement | null = null;
+
+// 地图标记点击：滚动到对应 gallery 并定位到该张图片，滚动完成后以悬浮样式高亮 3s
+function onMapMarkerClick(image: ImageItem) {
+  const country = image.country;
+  const galleryId = galleryIds.value[country];
+  if (!galleryId) return;
+
+  const countryImages = groupedByCountry.value[country];
+  const index = countryImages?.findIndex((img) => img.path === image.path) ?? -1;
+  if (index < 0) return;
+
+  if (lastHighlightedOverlay?.isConnected) {
+    lastHighlightedOverlay.style.opacity = "";
+    lastHighlightedOverlay = null;
+  }
+  if (scrollEndCleanup) {
+    scrollEndCleanup();
+    scrollEndCleanup = null;
+  }
+  if (galleryHighlightTimeoutId) {
+    clearTimeout(galleryHighlightTimeoutId);
+    galleryHighlightTimeoutId = null;
+  }
+
+  nextTick(() => {
+    const itemEl = document.getElementById(`${galleryId}-img-${index}`);
+    if (!itemEl) return;
+
+    const galleryScrollEl = itemEl.parentElement;
+    if (!galleryScrollEl) return;
+
+    itemEl.scrollIntoView({ behavior: "smooth", inline: "center", block: "center" });
+
+    const applyHighlight = () => {
+      const overlay = itemEl.querySelector<HTMLElement>(".thumbnail-overlay");
+      if (!overlay || !overlay.isConnected) return;
+      lastHighlightedOverlay = overlay;
+      overlay.style.transition = "opacity 0.3s ease";
+      overlay.style.opacity = "1";
+      galleryHighlightTimeoutId = setTimeout(() => {
+        if (overlay.isConnected) overlay.style.opacity = "";
+        if (lastHighlightedOverlay === overlay) lastHighlightedOverlay = null;
+        galleryHighlightTimeoutId = null;
+      }, GALLERY_HOVER_HIGHLIGHT_MS);
+    };
+
+    const onScrollEnd = () => {
+      if (scrollEndTimeoutId) clearTimeout(scrollEndTimeoutId);
+      scrollEndTimeoutId = setTimeout(() => {
+        if (scrollEndCleanup) {
+          scrollEndCleanup();
+          scrollEndCleanup = null;
+        }
+        scrollEndTimeoutId = null;
+        applyHighlight();
+      }, SCROLL_END_DEBOUNCE_MS);
+    };
+
+    scrollEndCleanup = () => {
+      window.removeEventListener("scroll", onScrollEnd, { passive: true });
+      galleryScrollEl.removeEventListener("scroll", onScrollEnd, { passive: true });
+      if (scrollEndTimeoutId) {
+        clearTimeout(scrollEndTimeoutId);
+        scrollEndTimeoutId = null;
+      }
+    };
+
+    window.addEventListener("scroll", onScrollEnd, { passive: true });
+    galleryScrollEl.addEventListener("scroll", onScrollEnd, { passive: true });
+    onScrollEnd();
+  });
+}
 
 // 将中文国家名转换为英文类名
 function getCountryClassName(country: string): string {

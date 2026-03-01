@@ -24,6 +24,7 @@
         >
           <div 
             class="gallery-item" 
+            :id="galleryId + '-img-' + index"
             v-for="(item, index) in images" 
             :key="'image-' + galleryId + '-' + index"
             @click="handleImageClick(item)"
