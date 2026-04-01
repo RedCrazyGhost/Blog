@@ -10,9 +10,9 @@
     
     <!-- 图片画廊组件 -->
     <HorizontalImageGallery
-      v-for="(images, country) in groupedByCountry"
+      v-for="country in orderedCountries"
       :key="country"
-      :images="images"
+      :images="groupedByCountry[country]"
       :title="country"
       :title-class="'header-' + getCountryClassName(country)"
       :gallery-id="galleryIds[country]"
@@ -80,137 +80,12 @@ import { ref, computed, nextTick } from "vue";
 import HorizontalImageGallery from "@/components/image/HorizontalImageGallery.vue";
 import ImageMap from "@/components/image/ImageMap.vue";
 import type { ImageItem } from "@/types/image";
+import { initialImages } from "@/data/images";
 
 const CDN = useCDNStore();
 const theme = useThemeStore();
 
-// 扩展 ImageItem 类型以支持懒加载
-interface ExtendedImageItem extends ImageItem {
-  shouldLoad?: boolean;
-}
-
-const Images = ref<ExtendedImageItem[]>([
-  {
-    path: "/IMG/1.png",
-    alt: "江之岛拍摄的富士山",
-    title: "山-岛",
-    desc: "江之岛拍摄的富士山",
-    country: "日本",
-    isLoading: true,
-    shouldLoad: false,
-    location: {
-      lat: 35.2971,
-      lng: 139.4833,
-      city: "江之岛",
-      province: "神奈川县"
-    }
-  },
-  {
-    path: "/IMG/2.png",
-    alt: "夜晚的七里滨",
-    title: "夜之滨",
-    desc: "夜晚的七里滨",
-    country: "日本",
-    isLoading: true,
-    shouldLoad: false,
-    location: {
-      lat: 35.3089,
-      lng: 139.5203,
-      city: "七里滨",
-      province: "神奈川县"
-    }
-  },
-  {
-    path: "/IMG/3.png",
-    alt: "清水寺",
-    title: "清水寺",
-    desc: "",
-    country: "日本",
-    isLoading: true,
-    shouldLoad: false,
-    location: {
-      lat: 34.9949,
-      lng: 135.7850,
-      city: "京都",
-      province: "京都府"
-    }
-  },
-  {
-    path: "/IMG/4.png",
-    alt: "京都",
-    title: "京都-鸭川",
-    desc: "",
-    country: "日本",
-    isLoading: true,
-    shouldLoad: false,
-    location: {
-      lat: 35.0116,
-      lng: 135.7681,
-      city: "京都",
-      province: "京都府"
-    }
-  },
-  {
-    path: "/IMG/5.png",
-    alt: "奈良公园",
-    title: "奈良公园",
-    desc: "",
-    country: "日本",
-    isLoading: true,
-    shouldLoad: false,
-    location: {
-      lat: 34.6851,
-      lng: 135.8400,
-      city: "奈良",
-      province: "奈良县"
-    }
-  },
-  {
-    path: "/IMG/6.png",
-    alt: "函馆山",
-    title: "函馆山夜",
-    desc: "夜晚的函馆",
-    country: "日本",
-    isLoading: false,
-    shouldLoad: false,
-    location: {
-      lat: 41.7688,
-      lng: 140.7289,
-      city: "函馆",
-      province: "北海道"
-    }
-  },
-  {
-    path: "/IMG/7.png",
-    alt: "五棱郭",
-    title: "五棱郭",
-    desc: "",
-    country: "日本",
-    isLoading: true,
-    shouldLoad: false,
-    location: {
-      lat: 41.7970,
-      lng: 140.7565,
-      city: "函馆",
-      province: "北海道"
-    }
-  },
-  {
-    path: "/IMG/8.png",
-    alt: "五棱郭-樱花群",
-    title: "樱花群",
-    desc: "五棱郭",
-    country: "日本",
-    isLoading: true,
-    shouldLoad: false,
-    location: {
-      lat: 41.7970,
-      lng: 140.7565,
-      city: "函馆",
-      province: "北海道"
-    }
-  },
-]);
+const Images = ref(initialImages);
 
 // 按国家分组
 const groupedByCountry = computed(() => {
@@ -222,6 +97,16 @@ const groupedByCountry = computed(() => {
     grouped[image.country].push(image);
   });
   return grouped;
+});
+
+// 国家展示顺序：中国固定第一，其余按出现顺序
+const orderedCountries = computed(() => {
+  const countries = Object.keys(groupedByCountry.value);
+  return countries.sort((a, b) => {
+    if (a === "中国") return -1;
+    if (b === "中国") return 1;
+    return 0;
+  });
 });
 
 // 生成每个国家对应的图片框 ID（用于地图跳转）
@@ -543,16 +428,9 @@ function closeFullscreen() {
 
 /* 中国风格 - 红色渐变 */
 .header-china {
-  background: linear-gradient(135deg, #c8102e 0%, #dc143c 50%, #ff1744 100%);
-  background-image: 
-    radial-gradient(circle at 30% 40%, rgba(255, 215, 0, 0.2) 0%, transparent 40%),
-    repeating-linear-gradient(
-      45deg,
-      transparent,
-      transparent 8px,
-      rgba(255,255,255,0.1) 8px,
-      rgba(255,255,255,0.1) 16px
-    );
+  background: linear-gradient(135deg, #d9101a 0%, #ee1c25 52%, #ff2a33 100%);
+  position: relative;
+  overflow: hidden;
 }
 
 /* 美国风格 - 蓝白条纹 */

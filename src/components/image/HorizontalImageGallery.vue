@@ -413,16 +413,9 @@ onUnmounted(() => {
 }
 
 .header-china {
-  background: linear-gradient(135deg, #c8102e 0%, #dc143c 50%, #ff1744 100%);
-  background-image: 
-    radial-gradient(circle at 30% 40%, rgba(255, 215, 0, 0.2) 0%, transparent 40%),
-    repeating-linear-gradient(
-      45deg,
-      transparent,
-      transparent 8px,
-      rgba(255,255,255,0.1) 8px,
-      rgba(255,255,255,0.1) 16px
-    );
+  background: linear-gradient(135deg, #d9101a 0%, #ee1c25 52%, #ff2a33 100%);
+  position: relative;
+  overflow: hidden;
 }
 
 .header-usa {
