@@ -10,9 +10,9 @@ export interface ThemeColor {
 function updateHtmlDarkClass(isDark: boolean) {
   const htmlElement = document.documentElement;
   if (isDark) {
-    htmlElement.classList.add('dark');
+    htmlElement.classList.add("dark");
   } else {
-    htmlElement.classList.remove('dark');
+    htmlElement.classList.remove("dark");
   }
 }
 
@@ -23,8 +23,8 @@ export const useThemeStore = defineStore("Theme", () => {
   });
 
   // 初始化时设置 dark class
-  if (typeof document !== 'undefined') {
-    updateHtmlDarkClass(Theme.value.BackgroundColor === 'dark');
+  if (typeof document !== "undefined") {
+    updateHtmlDarkClass(Theme.value.BackgroundColor === "dark");
   }
 
   function SetThemeLight() {
@@ -43,28 +43,28 @@ export const useThemeStore = defineStore("Theme", () => {
   watch(
     () => Theme.value.BackgroundColor,
     (newColor) => {
-      updateHtmlDarkClass(newColor === 'dark');
-    }
+      updateHtmlDarkClass(newColor === "dark");
+    },
   );
 
   const GetThemeStyle = computed(
-    () => `bg-${Theme.value.BackgroundColor} text-${Theme.value.FontColor}`
+    () => `bg-${Theme.value.BackgroundColor} text-${Theme.value.FontColor}`,
   );
 
   const GetThemeColor = computed(() => Theme.value.BackgroundColor);
 
   const GetBackgroundColorStyle = computed(
-    () => `bg-${Theme.value.BackgroundColor}`
+    () => `bg-${Theme.value.BackgroundColor}`,
   );
 
   const GetFontColorStyle = computed(() => `text-${Theme.value.FontColor}`);
 
   const GetNavbarStyle = computed(
-    () => `navbar-${Theme.value.BackgroundColor}`
+    () => `navbar-${Theme.value.BackgroundColor}`,
   );
 
   const GetTableColor = computed(() =>
-    Theme.value.BackgroundColor === "light" ? "" : "table-dark"
+    Theme.value.BackgroundColor === "light" ? "" : "table-dark",
   );
 
   function SwitchTheme() {

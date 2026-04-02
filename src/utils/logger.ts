@@ -11,7 +11,7 @@ export const logger = {
    */
   log: (...args: unknown[]): void => {
     if (isDev) {
-      console.log('[LOG]', ...args);
+      console.log("[LOG]", ...args);
     }
   },
 
@@ -19,7 +19,7 @@ export const logger = {
    * 错误日志（始终输出）
    */
   error: (...args: unknown[]): void => {
-    console.error('[ERROR]', ...args);
+    console.error("[ERROR]", ...args);
   },
 
   /**
@@ -27,7 +27,7 @@ export const logger = {
    */
   warn: (...args: unknown[]): void => {
     if (isDev) {
-      console.warn('[WARN]', ...args);
+      console.warn("[WARN]", ...args);
     }
   },
 
@@ -36,7 +36,7 @@ export const logger = {
    */
   info: (...args: unknown[]): void => {
     if (isDev) {
-      console.info('[INFO]', ...args);
+      console.info("[INFO]", ...args);
     }
   },
 
@@ -44,9 +44,8 @@ export const logger = {
    * 调试日志
    */
   debug: (...args: unknown[]): void => {
-    if (isDev && import.meta.env.VITE_DEBUG === 'true') {
-      console.debug('[DEBUG]', ...args);
+    if (isDev && import.meta.env.VITE_DEBUG === "true") {
+      console.debug("[DEBUG]", ...args);
     }
   },
 };
-

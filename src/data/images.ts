@@ -164,7 +164,7 @@ export const initialImages: ExtendedImageItem[] = [
     isLoading: true,
     shouldLoad: false,
     location: {
-      lat: 30.5890,
+      lat: 30.589,
       lng: 114.3014,
       city: "武汉",
       province: "湖北省",
@@ -212,8 +212,8 @@ export const initialImages: ExtendedImageItem[] = [
       lat: 34.9965,
       lng: 135.7786,
       city: "京都",
-      province: "京都府"
-    }
+      province: "京都府",
+    },
   },
   {
     path: "/IMG/29e6d8277e.jpeg",
@@ -227,8 +227,8 @@ export const initialImages: ExtendedImageItem[] = [
       lat: 31.2397,
       lng: 121.4998,
       city: "上海",
-      province: "上海市"
-    }
+      province: "上海市",
+    },
   },
   {
     path: "/IMG/63fd7fa5e8.jpeg",
@@ -317,8 +317,8 @@ export const initialImages: ExtendedImageItem[] = [
       lat: 32.0706,
       lng: 118.7996,
       city: "南京",
-      province: "江苏省"
-    }
+      province: "江苏省",
+    },
   },
   {
     path: "/IMG/57912c800d.jpeg",
@@ -332,8 +332,8 @@ export const initialImages: ExtendedImageItem[] = [
       lat: 32.0706,
       lng: 118.7996,
       city: "南京",
-      province: "江苏省"
-    }
+      province: "江苏省",
+    },
   },
   {
     path: "/IMG/03fce8dc2c.jpeg",
@@ -371,8 +371,8 @@ export const initialImages: ExtendedImageItem[] = [
       lat: 25.9892,
       lng: 105.6671,
       city: "安顺",
-      province: "贵州省"
-    }
+      province: "贵州省",
+    },
   },
   {
     path: "/IMG/a23d6ef502.jpeg",
@@ -446,7 +446,7 @@ export const initialImages: ExtendedImageItem[] = [
       lat: 26.3116,
       lng: 107.482,
       city: "三江",
-      province: "广西壮族自治区"
-    }
-  }
+      province: "广西壮族自治区",
+    },
+  },
 ];

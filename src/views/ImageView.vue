@@ -1,13 +1,13 @@
 <template>
   <div :class="'image-gallery-container ' + theme.GetBackgroundColorStyle">
     <!-- 地图组件 -->
-    <ImageMap 
+    <ImageMap
       :images="Images"
       :grouped-images="groupedByCountry"
       :gallery-ids="galleryIds"
       @marker-click="onMapMarkerClick"
     />
-    
+
     <!-- 图片画廊组件 -->
     <HorizontalImageGallery
       v-for="country in orderedCountries"
@@ -32,7 +32,7 @@
     <!-- 图片模态框 -->
     <div v-if="selectedImage" class="image-modal" @click="closeImageModal">
       <div class="modal-content" @click.stop>
-        <button class="modal-close" @click="closeImageModal" aria-label="关闭">
+        <button class="modal-close" aria-label="关闭" @click="closeImageModal">
           <font-awesome-icon icon="fas fa-times" />
         </button>
         <img :src="CDN.getURL(selectedImage.path)" :alt="selectedImage.alt" />
@@ -40,19 +40,19 @@
           <h3>{{ selectedImage.title }}</h3>
           <p v-if="selectedImage.desc">{{ selectedImage.desc }}</p>
         </div>
-        <button 
-          class="modal-nav modal-nav-prev" 
-          @click="navigateImage(-1)"
+        <button
           v-if="currentImageIndex > 0"
+          class="modal-nav modal-nav-prev"
           aria-label="上一张"
+          @click="navigateImage(-1)"
         >
           <font-awesome-icon icon="fas fa-chevron-left" />
         </button>
-        <button 
-          class="modal-nav modal-nav-next" 
-          @click="navigateImage(1)"
+        <button
           v-if="currentImageIndex < currentImageList.length - 1"
+          class="modal-nav modal-nav-next"
           aria-label="下一张"
+          @click="navigateImage(1)"
         >
           <font-awesome-icon icon="fas fa-chevron-right" />
         </button>
@@ -60,12 +60,20 @@
     </div>
 
     <!-- 全屏查看模态框 -->
-    <div v-if="fullscreenImage" class="fullscreen-modal" @click="closeFullscreen">
-      <button class="fullscreen-close" @click="closeFullscreen" aria-label="关闭全屏">
+    <div
+      v-if="fullscreenImage"
+      class="fullscreen-modal"
+      @click="closeFullscreen"
+    >
+      <button
+        class="fullscreen-close"
+        aria-label="关闭全屏"
+        @click="closeFullscreen"
+      >
         <font-awesome-icon icon="fas fa-times" />
       </button>
-      <img 
-        :src="CDN.getURL(fullscreenImage.path)" 
+      <img
+        :src="CDN.getURL(fullscreenImage.path)"
         :alt="fullscreenImage.alt"
         @click.stop
       />
@@ -135,7 +143,8 @@ function onMapMarkerClick(image: ImageItem) {
   if (!galleryId) return;
 
   const countryImages = groupedByCountry.value[country];
-  const index = countryImages?.findIndex((img) => img.path === image.path) ?? -1;
+  const index =
+    countryImages?.findIndex((img) => img.path === image.path) ?? -1;
   if (index < 0) return;
 
   if (lastHighlightedOverlay?.isConnected) {
@@ -158,7 +167,11 @@ function onMapMarkerClick(image: ImageItem) {
     const galleryScrollEl = itemEl.parentElement;
     if (!galleryScrollEl) return;
 
-    itemEl.scrollIntoView({ behavior: "smooth", inline: "center", block: "center" });
+    itemEl.scrollIntoView({
+      behavior: "smooth",
+      inline: "center",
+      block: "center",
+    });
 
     const applyHighlight = () => {
       const overlay = itemEl.querySelector<HTMLElement>(".thumbnail-overlay");
@@ -186,16 +199,24 @@ function onMapMarkerClick(image: ImageItem) {
     };
 
     scrollEndCleanup = () => {
-      window.removeEventListener("scroll", onScrollEnd, { passive: true } as AddEventListenerOptions);
-      galleryScrollEl.removeEventListener("scroll", onScrollEnd, { passive: true } as AddEventListenerOptions);
+      window.removeEventListener("scroll", onScrollEnd, {
+        passive: true,
+      } as AddEventListenerOptions);
+      galleryScrollEl.removeEventListener("scroll", onScrollEnd, {
+        passive: true,
+      } as AddEventListenerOptions);
       if (scrollEndTimeoutId) {
         clearTimeout(scrollEndTimeoutId);
         scrollEndTimeoutId = null;
       }
     };
 
-    window.addEventListener("scroll", onScrollEnd, { passive: true } as AddEventListenerOptions);
-    galleryScrollEl.addEventListener("scroll", onScrollEnd, { passive: true } as AddEventListenerOptions);
+    window.addEventListener("scroll", onScrollEnd, {
+      passive: true,
+    } as AddEventListenerOptions);
+    galleryScrollEl.addEventListener("scroll", onScrollEnd, {
+      passive: true,
+    } as AddEventListenerOptions);
     onScrollEnd();
   });
 }
@@ -203,33 +224,25 @@ function onMapMarkerClick(image: ImageItem) {
 // 将中文国家名转换为英文类名
 function getCountryClassName(country: string): string {
   const nameMap: Record<string, string> = {
-    '日本': 'japan',
-    '中国': 'china',
-    '美国': 'usa',
-    '法国': 'france',
-    '意大利': 'italy',
+    "日本": "japan",
+    "中国": "china",
+    "美国": "usa",
+    "法国": "france",
+    "意大利": "italy",
   };
-  return nameMap[country] || 'default';
+  return nameMap[country] || "default";
 }
 
-
-// 图片模态框
+// 图片模态框状态
 const selectedImage = ref<ImageItem | null>(null);
 const currentImageList = ref<ImageItem[]>([]);
 const currentImageIndex = ref(0);
-
-function openImageModal(image: ImageItem, images: ImageItem[]) {
-  selectedImage.value = image;
-  currentImageList.value = images;
-  currentImageIndex.value = images.findIndex(img => img.path === image.path);
-  document.body.style.overflow = 'hidden';
-}
 
 function closeImageModal() {
   selectedImage.value = null;
   currentImageList.value = [];
   currentImageIndex.value = 0;
-  document.body.style.overflow = '';
+  document.body.style.overflow = "";
 }
 
 function navigateImage(direction: number) {
@@ -245,36 +258,16 @@ const fullscreenImage = ref<ImageItem | null>(null);
 
 function openFullscreen(image: ImageItem) {
   fullscreenImage.value = image;
-  document.body.style.overflow = 'hidden';
+  document.body.style.overflow = "hidden";
 }
 
 function closeFullscreen() {
   fullscreenImage.value = null;
-  document.body.style.overflow = '';
+  document.body.style.overflow = "";
 }
-
 </script>
 
 <style scoped>
-.image-gallery-container {
-  min-height: calc(100vh - 9.75rem);
-}
-
-.image-gallery-container.bg-light {
-  background: #f5f5f5;
-}
-
-.image-gallery-container.bg-dark {
-  background: #212529;
-}
-
-/* 日本风格 - 樱花粉渐变 + 樱花飘落动画 */
-.header-japan {
-  background: linear-gradient(135deg, #ff6b9d 0%, #ffb3d1 50%, #ffd6e8 100%);
-  position: relative;
-  overflow: hidden;
-}
-
 /* 樱花花瓣样式 */
 .sakura-petal {
   position: absolute;
@@ -323,62 +316,6 @@ function closeFullscreen() {
   animation-delay: 2.5s;
 }
 
-/* 樱花飘落动画 - 使用伪元素创建多个花瓣（旧代码，将被新代码覆盖） */
-.header-japan::before,
-.header-japan::after {
-  content: '';
-  position: absolute;
-  width: 10px;
-  height: 10px;
-  background: rgba(255, 255, 255, 0.8);
-  border-radius: 50% 0 50% 0;
-  pointer-events: none;
-  z-index: 1;
-}
-
-.header-japan::before {
-  left: 10%;
-  top: -20px;
-  animation: sakura-fall-1 8s infinite linear;
-  box-shadow: 
-    200px 0 0 rgba(255, 255, 255, 0.7),
-    400px 0 0 rgba(255, 255, 255, 0.6),
-    600px 0 0 rgba(255, 255, 255, 0.8),
-    800px 0 0 rgba(255, 255, 255, 0.7);
-}
-
-.header-japan::after {
-  left: 20%;
-  top: -20px;
-  animation: sakura-fall-2 10s infinite linear;
-  animation-delay: 1s;
-  box-shadow: 
-    150px 0 0 rgba(255, 255, 255, 0.6),
-    350px 0 0 rgba(255, 255, 255, 0.7),
-    550px 0 0 rgba(255, 255, 255, 0.5),
-    750px 0 0 rgba(255, 255, 255, 0.6);
-}
-
-/* 使用标题的伪元素创建更多花瓣 */
-.header-japan .section-title::before {
-  content: '';
-  position: absolute;
-  width: 8px;
-  height: 8px;
-  background: rgba(255, 255, 255, 0.7);
-  border-radius: 50% 0 50% 0;
-  left: -50px;
-  top: -20px;
-  pointer-events: none;
-  z-index: 1;
-  animation: sakura-fall-3 12s infinite linear;
-  animation-delay: 2s;
-  box-shadow: 
-    100px 0 0 rgba(255, 255, 255, 0.5),
-    250px 0 0 rgba(255, 255, 255, 0.6),
-    450px 0 0 rgba(255, 255, 255, 0.7),
-    650px 0 0 rgba(255, 255, 255, 0.5);
-}
 
 /* 樱花飘落动画 - 不同的路径和速度 */
 @keyframes sakura-fall-1 {
@@ -425,65 +362,6 @@ function closeFullscreen() {
     opacity: 0;
   }
 }
-
-/* 中国风格 - 红色渐变 */
-.header-china {
-  background: linear-gradient(135deg, #d9101a 0%, #ee1c25 52%, #ff2a33 100%);
-  position: relative;
-  overflow: hidden;
-}
-
-/* 美国风格 - 蓝白条纹 */
-.header-usa {
-  background: linear-gradient(135deg, #002868 0%, #0033a0 50%, #1e3a8a 100%);
-  background-image: 
-    repeating-linear-gradient(
-      0deg,
-      transparent,
-      transparent 4px,
-      rgba(255,255,255,0.1) 4px,
-      rgba(255,255,255,0.1) 8px
-    ),
-    repeating-linear-gradient(
-      90deg,
-      transparent,
-      transparent 8px,
-      rgba(255,255,255,0.08) 8px,
-      rgba(255,255,255,0.08) 16px
-    );
-}
-
-/* 法国风格 - 蓝白红三色 */
-.header-france {
-  background: linear-gradient(135deg, #002654 0%, #0055a4 33%, #ffffff 33%, #ffffff 66%, #ef4135 66%, #ed2939 100%);
-  background-image: 
-    repeating-linear-gradient(
-      45deg,
-      transparent,
-      transparent 10px,
-      rgba(0,0,0,0.05) 10px,
-      rgba(0,0,0,0.05) 20px
-    );
-}
-
-/* 意大利风格 - 绿白红三色 */
-.header-italy {
-  background: linear-gradient(135deg, #009246 0%, #ffffff 33%, #ffffff 66%, #ce2b37 66%, #ce2b37 100%);
-  background-image: 
-    repeating-linear-gradient(
-      45deg,
-      transparent,
-      transparent 10px,
-      rgba(0,0,0,0.05) 10px,
-      rgba(0,0,0,0.05) 20px
-    );
-}
-
-/* 默认风格 */
-.header-default {
-  background: linear-gradient(135deg, #6c757d 0%, #495057 50%, #343a40 100%);
-}
-
 
 /* 图片模态框 */
 .image-modal {
@@ -553,7 +431,6 @@ function closeFullscreen() {
   margin: 0.25rem 0;
   opacity: 0.9;
 }
-
 
 .modal-nav {
   position: absolute;

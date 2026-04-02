@@ -21,7 +21,10 @@ export class Cache<T> {
     if (this.cleanupInterval !== null) {
       clearInterval(this.cleanupInterval);
     }
-    this.cleanupInterval = window.setInterval(() => this.cleanup(), this.maxSaveTime);
+    this.cleanupInterval = window.setInterval(
+      () => this.cleanup(),
+      this.maxSaveTime,
+    );
   }
 
   /**
@@ -36,11 +39,13 @@ export class Cache<T> {
 
   private cleanup() {
     const now = Date.now();
-    Object.entries(this.cache).forEach(([key, value]: [string, CacheItem<T>]) => {
-      if (now - value.timestamp > this.maxSaveTime) {
-        delete this.cache[key];
-      }
-    });
+    Object.entries(this.cache).forEach(
+      ([key, value]: [string, CacheItem<T>]) => {
+        if (now - value.timestamp > this.maxSaveTime) {
+          delete this.cache[key];
+        }
+      },
+    );
     this.saveToLocalStorage();
   }
 
@@ -56,12 +61,12 @@ export class Cache<T> {
   }
 
   set(key: string, value: T) {
-      this.cache[key] = {
-        data: value,
-        timestamp: Date.now(),
-      };
-      this.saveToLocalStorage();
-    }
+    this.cache[key] = {
+      data: value,
+      timestamp: Date.now(),
+    };
+    this.saveToLocalStorage();
+  }
 
   /**
    * 更新已存在的缓存项
@@ -93,20 +98,22 @@ export class Cache<T> {
   getAll(): T[] {
     const now = Date.now();
     const validItems: T[] = [];
-    
-    Object.entries(this.cache).forEach(([key, value]: [string, CacheItem<T>]) => {
-      if (now - value.timestamp <= this.maxSaveTime) {
-        validItems.push(value.data);
-      } else {
-        // 清理过期项
-        delete this.cache[key];
-      }
-    });
-    
+
+    Object.entries(this.cache).forEach(
+      ([key, value]: [string, CacheItem<T>]) => {
+        if (now - value.timestamp <= this.maxSaveTime) {
+          validItems.push(value.data);
+        } else {
+          // 清理过期项
+          delete this.cache[key];
+        }
+      },
+    );
+
     if (Object.keys(this.cache).length !== Object.keys(this.cache).length) {
       this.saveToLocalStorage();
     }
-    
+
     return validItems;
   }
 

@@ -37,6 +37,12 @@ const router = createRouter({
       meta: { title: "加载中" },
     },
     {
+      path: "/about",
+      name: "about",
+      component: () => import("@/views/AboutView.vue"),
+      meta: { title: "关于我" },
+    },
+    {
       path: "/:pathMatch(.*)*",
       name: "404",
       component: () => import("@/views/404View.vue"),

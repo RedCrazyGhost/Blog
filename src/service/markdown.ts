@@ -12,7 +12,7 @@ marked.use(
   { renderer: TableRenderer },
   { renderer: CodeRenderer },
   { renderer: TextRenderer },
-  { renderer: ImageRenderer }
+  { renderer: ImageRenderer },
 );
 
 export class MarkdownService {
@@ -31,7 +31,7 @@ export class MarkdownService {
 
   insertMarkdown(
     markdowns: MarkdownContent[],
-    newMarkdown: MarkdownContent
+    newMarkdown: MarkdownContent,
   ): MarkdownContent[] {
     const index = markdowns.findIndex((md) => md.number === newMarkdown.number);
     if (index !== -1) {

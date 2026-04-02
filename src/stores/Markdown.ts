@@ -1,6 +1,5 @@
 import { ref, computed, watch } from "vue";
 import { defineStore } from "pinia";
-import { marked } from "marked";
 import mermaid from "mermaid";
 import type { MarkdownContent } from "@/types/markdown";
 import type { GithubIssue } from "@/types/github";
@@ -52,7 +51,7 @@ export const useMarkdownStore = defineStore("Markdown", () => {
         right = len - 1,
         ans = len;
       while (left <= right) {
-        let mid = ((right - left) >> 1) + left;
+        const mid = ((right - left) >> 1) + left;
         if (data.number > Markdowns.value[mid].number) {
           ans = mid;
           right = mid - 1;
@@ -89,7 +88,7 @@ export const useMarkdownStore = defineStore("Markdown", () => {
       if (currentMarkdown.value && currentMarkdown.value.body) {
         parseMarkdownAsync(currentMarkdown.value.body);
       }
-    }
+    },
   );
 
   return {

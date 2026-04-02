@@ -42,16 +42,18 @@ const mapContainer = ref<HTMLElement | null>(null);
 
 let map: L.Map | null = null;
 let imageMarkers: L.Marker[] = [];
-let currentTileLayer: L.TileLayer | null = null;
 let imageMarkerCluster: L.MarkerClusterGroup | null = null;
 
 // 创建图片图标（含加载失败时的占位，安全处理 parentElement）
 function createImageIcon(imagePath: string, size: number = 60): L.DivIcon {
   const imageUrl = CDN.getURL(imagePath);
   const fallbackHtml = `<div style="width:${size}px;height:${size}px;background:#dc3545;border-radius:8px;border:3px solid white;display:flex;align-items:center;justify-content:center;color:white;font-size:12px;">图片</div>`;
-  const fallbackEscaped = fallbackHtml.replace(/\\/g, "\\\\").replace(/'/g, "&#39;").replace(/"/g, "&quot;");
+  const fallbackEscaped = fallbackHtml
+    .replace(/\\/g, "\\\\")
+    .replace(/'/g, "&#39;")
+    .replace(/"/g, "&quot;");
   return L.divIcon({
-    className: 'image-marker-icon',
+    className: "image-marker-icon",
     html: `<div style="
       width: ${size}px;
       height: ${size}px;
@@ -74,21 +76,21 @@ function createImageIcon(imagePath: string, size: number = 60): L.DivIcon {
     </div>`,
     iconSize: [size, size],
     iconAnchor: [size / 2, size / 2],
-    popupAnchor: [0, -size / 2]
+    popupAnchor: [0, -size / 2],
   });
 }
 
 // 创建图片标记（显示所有图片，使用聚合）
 function createImageMarkers() {
   if (!map) return;
-  
+
   // 清除现有聚合组（会一并移除其下所有 marker）
   if (imageMarkerCluster) {
     map.removeLayer(imageMarkerCluster);
     imageMarkerCluster = null;
   }
   imageMarkers = [];
-  
+
   // 创建标记聚合组
   const clusterGroup = L.markerClusterGroup({
     chunkedLoading: true,
@@ -98,51 +100,60 @@ function createImageMarkers() {
     showCoverageOnHover: false, // 悬停时不显示覆盖范围
     zoomToBoundsOnClick: true, // 点击聚合标记时缩放到边界
     removeOutsideVisibleBounds: true, // 移除视野外的标记以提升性能
-    iconCreateFunction: function(cluster: L.MarkerCluster) {
+    iconCreateFunction: function (cluster: L.MarkerCluster) {
       const count = cluster.getChildCount();
-      let size = 'small';
+      let size = "small";
       if (count > 100) {
-        size = 'large';
+        size = "large";
       } else if (count > 10) {
-        size = 'medium';
+        size = "medium";
       }
-      
+
       return L.divIcon({
         html: `<div style="
           background: rgba(13, 110, 253, 0.8);
           color: white;
           border-radius: 50%;
-          width: ${size === 'large' ? '50px' : size === 'medium' ? '40px' : '30px'};
-          height: ${size === 'large' ? '50px' : size === 'medium' ? '40px' : '30px'};
+          width: ${
+            size === "large" ? "50px" : size === "medium" ? "40px" : "30px"
+          };
+          height: ${
+            size === "large" ? "50px" : size === "medium" ? "40px" : "30px"
+          };
           display: flex;
           align-items: center;
           justify-content: center;
           font-weight: bold;
-          font-size: ${size === 'large' ? '14px' : size === 'medium' ? '12px' : '10px'};
+          font-size: ${
+            size === "large" ? "14px" : size === "medium" ? "12px" : "10px"
+          };
           border: 3px solid white;
           box-shadow: 0 2px 8px rgba(0,0,0,0.3);
         ">${count}</div>`,
-        className: 'marker-cluster',
-        iconSize: L.point(size === 'large' ? 50 : size === 'medium' ? 40 : 30, size === 'large' ? 50 : size === 'medium' ? 40 : 30)
+        className: "marker-cluster",
+        iconSize: L.point(
+          size === "large" ? 50 : size === "medium" ? 40 : 30,
+          size === "large" ? 50 : size === "medium" ? 40 : 30,
+        ),
       });
-    }
+    },
   });
-  
+
   imageMarkerCluster = clusterGroup;
-  
+
   // 为每张图片创建标记并添加到聚合组
   props.images.forEach((image) => {
     if (!image.location?.lat || !image.location?.lng) return;
-    
+
     const marker = L.marker([image.location.lat, image.location.lng], {
-      icon: createImageIcon(image.path, 50)
+      icon: createImageIcon(image.path, 50),
     });
     marker.on("click", () => emit("marker-click", image));
-    
+
     imageMarkers.push(marker);
     clusterGroup.addLayer(marker);
   });
-  
+
   // 将聚合组添加到地图
   if (map) {
     clusterGroup.addTo(map);
@@ -152,40 +163,41 @@ function createImageMarkers() {
 // 初始化地图
 function initMap() {
   if (!mapContainer.value) return;
-  
+
   // 设置地图初始中心点为上海，缩放级别以显示整个中国和日本
   // 上海坐标：纬度 31.2304，经度 121.4737
   // 为了同时显示中国和日本，需要合适的缩放级别（约 4-5）
   const center: [number, number] = [31.2304, 121.4737]; // 上海
   const zoom = 4; // 缩放级别 4 可以显示整个中国和日本
-  
+
   map = L.map(mapContainer.value, {
     center,
     zoom,
     zoomControl: true,
-    attributionControl: true
+    attributionControl: true,
   });
-  
+
   // 使用 OpenStreetMap 标准样式（彩色地图，显示地理颜色和名称）
   // OpenStreetMap 提供彩色地图，显示地形、道路、地名等信息
-  currentTileLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-    maxZoom: 19,
-    tileSize: 256,
-    zoomOffset: 0
-  }).addTo(map);
-  
+  L.tileLayer(
+    "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+    {
+      attribution:
+        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      maxZoom: 19,
+      tileSize: 256,
+      zoomOffset: 0,
+    },
+  ).addTo(map);
+
   // 创建标记
   createImageMarkers();
-  
+
   // 地图加载完成后调整视图
   if (map) {
     map.whenReady(() => {
       if (!map) return;
-      const chinaJapanBounds = L.latLngBounds(
-        [18.0, 100.0],
-        [45.0, 145.0]
-      );
+      const chinaJapanBounds = L.latLngBounds([18.0, 100.0], [45.0, 145.0]);
       if (imageMarkerCluster) {
         const bounds = imageMarkerCluster.getBounds();
         if (bounds.isValid()) {
@@ -200,10 +212,7 @@ function initMap() {
   }
 }
 
-const chinaJapanBounds = L.latLngBounds(
-  [18.0, 100.0],
-  [45.0, 145.0]
-);
+const chinaJapanBounds = L.latLngBounds([18.0, 100.0], [45.0, 145.0]);
 
 function resetToInitialView() {
   if (!map) return;
@@ -220,11 +229,15 @@ function resetToInitialView() {
 }
 
 // 监听数据变化
-watch(() => props.images, () => {
-  if (map) {
-    createImageMarkers();
-  }
-}, { deep: true });
+watch(
+  () => props.images,
+  () => {
+    if (map) {
+      createImageMarkers();
+    }
+  },
+  { deep: true },
+);
 
 onMounted(() => {
   nextTick(() => {
@@ -242,7 +255,6 @@ onUnmounted(() => {
     map = null;
   }
   imageMarkers = [];
-  currentTileLayer = null;
 });
 </script>
 
@@ -262,7 +274,7 @@ onUnmounted(() => {
   height: 500px;
   border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .map-reset-btn {
@@ -283,7 +295,9 @@ onUnmounted(() => {
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   cursor: pointer;
-  transition: background 0.2s, box-shadow 0.2s;
+  transition:
+    background 0.2s,
+    box-shadow 0.2s;
 }
 
 .map-reset-btn:hover {
@@ -302,7 +316,7 @@ onUnmounted(() => {
 }
 
 :deep(.bg-dark) .map-container {
-  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 
 /* Leaflet 容器样式 */

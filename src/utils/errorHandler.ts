@@ -6,12 +6,12 @@ export class AppError extends Error {
   constructor(
     message: string,
     public code?: string,
-    public statusCode?: number
+    public statusCode?: number,
   ) {
     super(message);
-    this.name = 'AppError';
+    this.name = "AppError";
     // 保持堆栈跟踪 (V8/Node.js specific)
-    if (typeof (Error as any).captureStackTrace === 'function') {
+    if (typeof (Error as any).captureStackTrace === "function") {
       (Error as any).captureStackTrace(this, AppError);
     }
   }
@@ -42,7 +42,7 @@ export function handleError(error: unknown): ErrorInfo {
     };
   } else {
     return {
-      message: 'Unknown error occurred',
+      message: "Unknown error occurred",
     };
   }
 }
@@ -57,4 +57,3 @@ export function formatError(error: unknown): string {
   }
   return errorInfo.message;
 }
-

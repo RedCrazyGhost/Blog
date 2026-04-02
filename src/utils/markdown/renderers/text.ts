@@ -1,5 +1,5 @@
 export const TextRenderer = {
-    text(text: string) {
-        return text.replace(/\n/g, '<br>');
-    }
+  text(text: string) {
+    return text.replace(/\n/g, "<br>");
+  },
 };
