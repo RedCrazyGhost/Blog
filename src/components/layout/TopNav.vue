@@ -71,6 +71,13 @@
             <li>
               <router-link
                 class="text-inherit hover:opacity-80 transition-opacity block py-2"
+                to="/projects"
+                >项目</router-link
+              >
+            </li>
+            <li>
+              <router-link
+                class="text-inherit hover:opacity-80 transition-opacity block py-2"
                 to="/about"
                 >关于我</router-link
               >
@@ -141,6 +148,13 @@
               class="text-inherit hover:opacity-80 transition-opacity block py-2"
               to="/image"
               >摄影</router-link
+            >
+          </li>
+          <li>
+            <router-link
+              class="text-inherit hover:opacity-80 transition-opacity block py-2"
+              to="/projects"
+              >项目</router-link
             >
           </li>
           <li>

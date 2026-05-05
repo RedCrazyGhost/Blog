@@ -13,7 +13,7 @@ export const config = {
       import.meta.env.VITE_GITHUB_API_BASE_URL || "https://api.github.com",
   },
   app: {
-    version: import.meta.env.VITE_APP_VERSION || "v1.0.11",
+    version: import.meta.env.VITE_APP_VERSION || "v1.0.12",
     /** 关于页个人信息，数据模型见 @/types/profile */
     author: {
       name: import.meta.env.VITE_APP_AUTHOR_NAME || "RedCrazyGhost",

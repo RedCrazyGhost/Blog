@@ -37,6 +37,12 @@ const router = createRouter({
       meta: { title: "加载中" },
     },
     {
+      path: "/projects",
+      name: "projects",
+      component: () => import("@/views/ProjectsView.vue"),
+      meta: { title: "项目" },
+    },
+    {
       path: "/about",
       name: "about",
       component: () => import("@/views/AboutView.vue"),
