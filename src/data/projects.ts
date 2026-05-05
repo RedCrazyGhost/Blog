@@ -38,4 +38,23 @@ export const projects: ProjectItem[] = [
       "每周突变奖励经验列表（休闲到残酷全档）",
     ],
   },
+  {
+    id: "mqttz",
+    name: "MQTTZ",
+    tagline: "灵活易用的 MQTT 工具",
+    url: "https://github.com/RedCrazyGhost/MQTTZ",
+    description:
+      "Go 编写的 MQTT 客户端工具，支持多 Broker 连接管理、按间隔循环发送 Mock 数据、条件过滤/拦截订阅，以及多 Broker 之间 topic 转发。",
+    theme: "mqttz",
+    icon: "fas fa-network-wired",
+    ctaLabel: "GitHub",
+    ctaIcon: "fab fa-github",
+    tags: ["Go", "MQTT", "CLI", "IoT", "开源"],
+    highlights: [
+      "多 Broker 连接管理与别名（nickname）路由",
+      "按间隔循环发送 Mock 数据 topic（支持 conf / json 数据源）",
+      "订阅端处理器：条件过滤、拦截、转发到指定客户端",
+      "Wire 依赖注入 + zap 日志 + sonic JSON",
+    ],
+  },
 ];

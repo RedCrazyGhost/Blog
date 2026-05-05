@@ -14,11 +14,15 @@ export interface ProjectItem {
   /** 项目简介 */
   description: string;
   /** 项目主题，用于 ProjectCard 选择不同的视觉风格分支 */
-  theme: "txt" | "sc2";
+  theme: "txt" | "sc2" | "mqttz";
   /** FontAwesome 图标 class，例如 "fas fa-book-open" */
   icon: string;
   /** 标签 chips */
   tags: string[];
   /** 项目核心功能/亮点列表 */
   highlights?: string[];
+  /** 「访问按钮」文案，未设置时默认「访问站点」（GitHub 项目可设为 "GitHub"） */
+  ctaLabel?: string;
+  /** 「访问按钮」FontAwesome 图标，未设置时默认外链图标 */
+  ctaIcon?: string;
 }

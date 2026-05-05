@@ -33,6 +33,28 @@
           </div>
         </div>
       </template>
+
+      <template v-else-if="project.theme === 'mqttz'">
+        <div class="mqttz-banner">
+          <div class="mqttz-banner__chrome" aria-hidden="true">
+            <span class="mqttz-dot mqttz-dot--red"></span>
+            <span class="mqttz-dot mqttz-dot--yellow"></span>
+            <span class="mqttz-dot mqttz-dot--green"></span>
+            <span class="mqttz-banner__title">MQTTZ</span>
+          </div>
+          <div class="mqttz-banner__startup">
+            <img
+              class="mqttz-banner__screenshot"
+              :src="mqttzBannerImgUrl"
+              alt="MQTTZ 启动横幅：彩色 ASCII 字标与版本信息"
+              width="1024"
+              height="299"
+              loading="lazy"
+              decoding="async"
+            />
+          </div>
+        </div>
+      </template>
     </header>
 
     <div class="project-card__body">
@@ -84,8 +106,8 @@
           class="project-card__cta"
           :class="[ctaClass, { 'project-card__cta--with-tags': hasTags }]"
         >
-          <span>访问站点</span>
-          <font-awesome-icon icon="fas fa-arrow-up-right-from-square" />
+          <span>{{ ctaLabel }}</span>
+          <font-awesome-icon :icon="ctaIcon" />
         </a>
       </div>
     </div>
@@ -97,6 +119,9 @@ import { computed } from "vue";
 import TxtWordmark from "@/components/projects/TxtWordmark.vue";
 import { useThemeStore } from "@/stores/Theme";
 import type { ProjectItem } from "@/types/project";
+
+/** 与程序启动终端截图一致（M 白 / Q 绿 / T 青 / Z 红 + 白色元信息），见 public/images */
+const mqttzBannerImgUrl = `${import.meta.env.BASE_URL}images/mqttz-startup-banner.png`;
 
 const props = defineProps<{ project: ProjectItem }>();
 
@@ -116,24 +141,22 @@ const cardClass = computed(() => [
   isDark.value ? "project-card--dark" : "project-card--light",
 ]);
 
-const bannerClass = computed(() => `project-card__banner--${props.project.theme}`);
-
-const iconClass = computed(() =>
-  props.project.theme === "txt"
-    ? "project-card__icon--txt"
-    : "project-card__icon--sc2",
+const bannerClass = computed(
+  () => `project-card__banner--${props.project.theme}`,
 );
 
-const tagClass = computed(() =>
-  props.project.theme === "txt"
-    ? "project-card__tag--txt"
-    : "project-card__tag--sc2",
+const iconClass = computed(
+  () => `project-card__icon--${props.project.theme}`,
 );
 
-const ctaClass = computed(() =>
-  props.project.theme === "txt"
-    ? "project-card__cta--txt"
-    : "project-card__cta--sc2",
+const tagClass = computed(() => `project-card__tag--${props.project.theme}`);
+
+const ctaClass = computed(() => `project-card__cta--${props.project.theme}`);
+
+const ctaLabel = computed(() => props.project.ctaLabel ?? "访问站点");
+
+const ctaIcon = computed(
+  () => props.project.ctaIcon ?? "fas fa-arrow-up-right-from-square",
 );
 </script>
 
@@ -348,6 +371,84 @@ const ctaClass = computed(() =>
   font-weight: 500;
 }
 
+/* ---- mqttz banner：终端/命令行风 ---- */
+.project-card__banner--mqttz {
+  background: #000;
+  border-bottom: 1px solid rgba(34, 197, 94, 0.35);
+  min-height: 0;
+  height: auto;
+  align-items: stretch;
+  justify-content: flex-start;
+}
+
+.mqttz-banner {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  font-family: "SF Mono", "JetBrains Mono", Menlo, Consolas,
+    "Liberation Mono", monospace;
+  color: #d1d5db;
+}
+
+.mqttz-banner__chrome {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 0.75rem;
+  background: linear-gradient(180deg, #1c2230 0%, #161b22 100%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  position: relative;
+}
+
+.mqttz-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  display: inline-block;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25) inset;
+}
+
+.mqttz-dot--red {
+  background: #ff5f56;
+}
+
+.mqttz-dot--yellow {
+  background: #ffbd2e;
+}
+
+.mqttz-dot--green {
+  background: #27c93f;
+}
+
+.mqttz-banner__title {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.72rem;
+  letter-spacing: 0.05em;
+  color: rgba(255, 255, 255, 0.55);
+  user-select: none;
+}
+
+.mqttz-banner__startup {
+  flex: 1 1 auto;
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  display: block;
+  background: #000;
+}
+
+.mqttz-banner__screenshot {
+  display: block;
+  width: 100%;
+  max-width: none;
+  height: auto;
+  vertical-align: top;
+}
+
 /* ---- Body 通用 ---- */
 .project-card__body {
   padding: 1.25rem 1.5rem 1.5rem;
@@ -378,6 +479,14 @@ const ctaClass = computed(() =>
 
 .project-card__icon--sc2 {
   color: #ffb800;
+}
+
+.project-card__icon--mqttz {
+  color: #16a34a;
+}
+
+.project-card--dark .project-card__icon--mqttz {
+  color: #4ade80;
 }
 
 .project-card__title-wrap {
@@ -500,6 +609,18 @@ const ctaClass = computed(() =>
   background: rgba(255, 184, 0, 0.1);
 }
 
+.project-card__tag--mqttz {
+  color: #15803d;
+  border-color: rgba(22, 163, 74, 0.4);
+  background: rgba(22, 163, 74, 0.08);
+}
+
+.project-card--dark .project-card__tag--mqttz {
+  color: #4ade80;
+  border-color: rgba(74, 222, 128, 0.45);
+  background: rgba(74, 222, 128, 0.1);
+}
+
 /* ---- CTA ---- */
 .project-card__cta {
   margin-top: 0;
@@ -551,6 +672,21 @@ const ctaClass = computed(() =>
   transform: translateY(-1px);
 }
 
+.project-card__cta--mqttz {
+  background: linear-gradient(135deg, #22c55e 0%, #15803d 100%);
+  color: #fff;
+  box-shadow: 0 2px 10px rgba(22, 163, 74, 0.3);
+}
+
+.project-card__cta--mqttz :deep(svg) {
+  color: inherit;
+}
+
+.project-card__cta--mqttz:hover {
+  box-shadow: 0 4px 16px rgba(22, 163, 74, 0.45);
+  transform: translateY(-1px);
+}
+
 @media (max-width: 640px) {
   .project-card__banner {
     height: 7.5rem;
@@ -560,8 +696,17 @@ const ctaClass = computed(() =>
     height: 8.5rem;
   }
 
+  .project-card__banner--mqttz {
+    height: auto;
+    min-height: 0;
+  }
+
   .sc2-banner__name {
     font-size: 1.45rem;
+  }
+
+  .mqttz-banner__title {
+    display: none;
   }
 
   .project-card__body {
