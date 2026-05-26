@@ -32,8 +32,11 @@ if ! git diff --cached --quiet; then
   git commit -m "chore: bump version to ${NEW_VERSION}" --no-verify
 fi
 
+REMOTE="${1:-origin}"
+BRANCH="$(git symbolic-ref --short HEAD)"
+
 export GIT_PUSH_AFTER_BUMP=1
-git push --no-verify "$@"
+git push --no-verify "$REMOTE" "$BRANCH"
 status=$?
 
 echo "已更新版本至 ${NEW_VERSION} 并完成推送。" >&2
