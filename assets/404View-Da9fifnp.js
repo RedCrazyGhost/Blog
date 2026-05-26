@@ -1,0 +1,1 @@
+import{_ as e}from"./_plugin-vue_export-helper-BCo6x5W8.js";import{o as t,b as r,f as s}from"./vendor-vue-Bmxui_pH.js";const n={},o={class:"container mx-auto px-4 flex items-center justify-center min-h-[60vh]"},a=[s("div",{class:"text-6xl"},"🤔 资源似乎不见了",-1)];const i=e(n,[["render",function(e,s){return t(),r("div",o,a)}]]);export{i as default};

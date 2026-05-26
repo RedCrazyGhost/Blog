@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+  <head>
+    <meta charset="UTF-8">
+    <script>
+      try {
+        if (localStorage.getItem("blog-theme") === "dark") {
+          document.documentElement.classList.add("dark");
+        }
+      } catch (e) {}
+    </script>
+    <!-- <link rel="icon" href="/favicon.ico"> -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RedCrazyGhost's Blog</title>
+    <meta name="author" content="RedCrazyGhost">
+    <meta name="description" content="RedCrazyGhost's Blog">
+    <!-- 主字体 CDN 预加载（与 src/config 中 urls[1] 一致） -->
+    <link
+      rel="preload"
+      href="https://cdn.jsdelivr.net/gh/RedCrazyGhost/CDN/TTF/HYCuYuanJ-Blog-RedCrazyGhost.ttf"
+      as="font"
+      type="font/ttf"
+      crossorigin="anonymous"
+    >
+    <script type="module" crossorigin src="/assets/index-DlMuZTxP.js"></script>
+    <link rel="modulepreload" crossorigin href="/assets/vendor-vue-Bmxui_pH.js">
+    <link rel="modulepreload" crossorigin href="/assets/vendor-icons-DjxcLCT8.js">
+    <link rel="modulepreload" crossorigin href="/assets/vendor-markdown-OxJK69Og.js">
+    <link rel="stylesheet" crossorigin href="/assets/index-CAduaVG3.css">
+  </head>
+  <body>
+    <div id="app"></div>
+  </body>
+</html>

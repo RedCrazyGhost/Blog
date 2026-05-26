@@ -1,0 +1,1 @@
+import{_ as e}from"./_plugin-vue_export-helper-BCo6x5W8.js";import{o,b as s,g as n,e as t}from"./vendor-vue-Bmxui_pH.js";const r={class:"container mx-auto px-4 flex items-center justify-center min-h-[60vh]"};const i=e({},[["render",function(e,i){const a=t("font-awesome-icon");return o(),s("div",r,[n(a,{icon:["fas","rotate"],size:"8x",spin:""})])}]]);export{i as L};

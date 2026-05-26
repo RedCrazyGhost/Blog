@@ -1,0 +1,1 @@
+import{L as s}from"./Loading-CS1igUZL.js";import{d as a,b as o,g as e,o as i}from"./vendor-vue-Bmxui_pH.js";const m=a({__name:"LoadingView",setup:a=>(a,m)=>(i(),o("div",null,[e(s,{style:{"min-height":"calc(100vh - 9.75rem)"}})]))});export{m as _};
