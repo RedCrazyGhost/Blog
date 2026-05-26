@@ -1,30 +1,41 @@
 <template>
-  <div class="markdown-content" v-html="m.parseCurrentMarkdownHTML"></div>
+  <div ref="contentRef" class="markdown-content" v-html="m.parseCurrentMarkdownHTML"></div>
 </template>
 <script setup lang="ts">
 import { useMarkdownStore } from "@/stores/Markdown";
+import { bindCodeBlockCopy } from "@/utils/markdown/codeBlockCopy";
 import mermaid from "mermaid";
 import { watch, nextTick, onUnmounted, ref } from "vue";
 
 const m = useMarkdownStore();
+const contentRef = ref<HTMLElement | null>(null);
 let renderTimer: number | null = null;
 let isRendering = ref(false);
+let unbindCopy: (() => void) | null = null;
+
+function setupCodeCopy() {
+  if (unbindCopy) {
+    unbindCopy();
+    unbindCopy = null;
+  }
+  if (contentRef.value) {
+    unbindCopy = bindCodeBlockCopy(contentRef.value);
+  }
+}
 
 async function renderMermaid() {
-  // 防止重复渲染
   if (isRendering.value) {
     return;
   }
 
   isRendering.value = true;
   await nextTick();
+  setupCodeCopy();
 
-  // 清除之前的定时器
   if (renderTimer !== null) {
     clearTimeout(renderTimer);
   }
 
-  // 使用 setTimeout 确保 DOM 完全渲染
   renderTimer = window.setTimeout(() => {
     mermaid.run();
     isRendering.value = false;
@@ -32,16 +43,18 @@ async function renderMermaid() {
   }, 0);
 }
 
-// 组件卸载时清理定时器
 onUnmounted(() => {
   if (renderTimer !== null) {
     clearTimeout(renderTimer);
     renderTimer = null;
   }
+  if (unbindCopy) {
+    unbindCopy();
+    unbindCopy = null;
+  }
   isRendering.value = false;
 });
 
-// 只使用 watch 监听 HTML 内容变化，避免 onUpdated 重复触发
 watch(
   () => m.parseCurrentMarkdownHTML,
   () => {

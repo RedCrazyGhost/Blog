@@ -59,6 +59,10 @@
       </div>
     </section>
 
+    <section class="about-activity mb-12">
+      <ActivityHeatmap />
+    </section>
+
     <section class="about-life mb-12">
       <h2 class="text-lg font-semibold mb-6">人生经历</h2>
       <VerticalTimeline :items="lifeItems" />
@@ -67,6 +71,7 @@
 </template>
 
 <script setup lang="ts">
+import ActivityHeatmap from "@/components/about/ActivityHeatmap.vue";
 import VerticalTimeline from "@/components/common/VerticalTimeline.vue";
 import type { TimelineItem } from "@/types/timeline";
 import { config } from "@/config";

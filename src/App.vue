@@ -52,6 +52,36 @@ pre[class*="language-"]::before {
   z-index: 1;
 }
 
+.code-block {
+  position: relative;
+}
+
+.code-copy-btn {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  z-index: 2;
+  padding: 0.2rem 0.5rem;
+  font-size: 0.75rem;
+  line-height: 1.25;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 0.25rem;
+  background: rgba(255, 255, 255, 0.9);
+  color: #24292f;
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+}
+
+.code-copy-btn:hover {
+  opacity: 0.85;
+}
+
+.dark .code-copy-btn {
+  border-color: rgba(255, 255, 255, 0.2);
+  background: rgba(45, 51, 59, 0.95);
+  color: #e6edf3;
+}
+
 pre[class*="language-"] {
   position: relative;
   padding: 2rem 1rem 16px 1rem;

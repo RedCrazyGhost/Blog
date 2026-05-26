@@ -4,7 +4,10 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "prepare": "node scripts/setup-git-hooks.mjs",
+    "version:bump": "node scripts/bump-version.mjs",
     "dev": "vite",
+    "fetch-heatmap": "node scripts/fetch-heatmap-data.mjs",
     "build": "run-p type-check \"build-only {@}\" --",
     "preview": "vite preview",
     "build-only": "vite build",

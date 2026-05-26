@@ -1,9 +1,17 @@
+import { readFileSync } from "node:fs";
 import path from "path";
 import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
 
+const pkg = JSON.parse(
+  readFileSync(path.resolve(__dirname, "package.json"), "utf-8"),
+) as { version: string };
+
 // https://vitejs.dev/config/
 export default defineConfig({
+  define: {
+    "import.meta.env.VITE_APP_VERSION": JSON.stringify(pkg.version),
+  },
   base:
     process.env.NODE_ENV === "production" ? process.env.BASE_URL || "/" : "/",
   plugins: [vue()],

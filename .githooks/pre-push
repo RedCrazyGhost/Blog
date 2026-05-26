@@ -1,0 +1,40 @@
+#!/bin/sh
+# 推送到 main 前自动 bump patch 版本并提交；通过 GIT_PUSH_AFTER_BUMP 避免重复执行
+set -e
+
+if [ -n "$SKIP_VERSION_BUMP" ] || [ -n "$CI" ]; then
+  exit 0
+fi
+
+if [ "$GIT_PUSH_AFTER_BUMP" = "1" ]; then
+  exit 0
+fi
+
+PUSH_TO_MAIN=0
+while read -r local_ref local_sha remote_ref remote_sha; do
+  case "$remote_ref" in
+    refs/heads/main) PUSH_TO_MAIN=1 ;;
+  esac
+done
+
+if [ "$PUSH_TO_MAIN" -eq 0 ]; then
+  exit 0
+fi
+
+ROOT="$(git rev-parse --show-toplevel)"
+cd "$ROOT" || exit 1
+
+NEW_VERSION="$(node scripts/bump-version.mjs)" || exit 1
+
+git add package.json package-lock.json
+
+if ! git diff --cached --quiet; then
+  git commit -m "chore: bump version to ${NEW_VERSION}" --no-verify
+fi
+
+export GIT_PUSH_AFTER_BUMP=1
+git push --no-verify "$@"
+status=$?
+
+echo "已更新版本至 ${NEW_VERSION} 并完成推送。" >&2
+exit "$status"

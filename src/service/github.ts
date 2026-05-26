@@ -9,14 +9,18 @@ const cache = new Cache<GithubIssue>("github", config.cache.defaultTTL);
 export class GithubService {
   private octokit: Octokit;
   private config: GithubConfig;
-  private haveNextPackge: boolean;
+  private hasMore: boolean;
 
   constructor(serviceConfig: GithubConfig) {
     this.octokit = new Octokit({
       baseUrl: config.github.apiBaseUrl,
     });
     this.config = serviceConfig;
-    this.haveNextPackge = true;
+    this.hasMore = true;
+  }
+
+  getHasMore(): boolean {
+    return this.hasMore;
   }
   async getIssue(
     id: number,
@@ -84,6 +88,9 @@ export class GithubService {
     page: number,
     size: number,
   ): Promise<GithubIssue[]> {
+    if (page === 1) {
+      this.hasMore = true;
+    }
     try {
       const response = await this.octokit.rest.issues.listForRepo({
         owner: this.config.owner,
@@ -95,8 +102,8 @@ export class GithubService {
       });
       const issues = response.data as GithubIssue[];
 
-      if (issues.length < size) {
-        this.haveNextPackge = false;
+      if (issues.length < size || issues.length === 0) {
+        this.hasMore = false;
       }
 
       // 缓存所有获取到的 issues（使用 issue number 作为 key）

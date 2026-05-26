@@ -33,6 +33,7 @@
       >
         <div
           :id="'miniMD-' + props.markdown.number"
+          ref="miniContentRef"
           v-html="miniMarkdownHTML"
         ></div>
 
@@ -80,6 +81,7 @@
 
 <script setup lang="ts">
 import { formatDate } from "@/utils/date";
+import { bindCodeBlockCopy } from "@/utils/markdown/codeBlockCopy";
 import { useThemeStore } from "@/stores/Theme";
 import { useMarkdownStore } from "@/stores/Markdown";
 import Tag from "@/components/common/Tag.vue";
@@ -98,7 +100,9 @@ const theme = useThemeStore();
 const m = useMarkdownStore();
 const props = defineProps<{ markdown: MarkdownContent }>();
 const miniMarkdownHTML = ref<string>("");
+const miniContentRef = ref<HTMLElement | null>(null);
 const isParsing = ref(false);
+let unbindCopy: (() => void) | null = null;
 const lastParsedBody = ref<string>("");
 let renderTimer: number | null = null;
 let isRendering = ref(false);
@@ -221,10 +225,24 @@ async function parseMiniMarkdown() {
 
       // 等待 DOM 更新后渲染 mermaid
       await nextTick();
+      setupCodeCopy();
       renderMermaid();
     }
   } finally {
     isParsing.value = false;
+  }
+}
+
+function setupCodeCopy() {
+  if (unbindCopy) {
+    unbindCopy();
+    unbindCopy = null;
+  }
+  const el =
+    miniContentRef.value ??
+    document.getElementById(`miniMD-${props.markdown.number}`);
+  if (el) {
+    unbindCopy = bindCodeBlockCopy(el);
   }
 }
 
@@ -290,6 +308,10 @@ onUnmounted(() => {
   if (renderTimer !== null) {
     clearTimeout(renderTimer);
     renderTimer = null;
+  }
+  if (unbindCopy) {
+    unbindCopy();
+    unbindCopy = null;
   }
   isRendering.value = false;
   window.removeEventListener("resize", handleResize);

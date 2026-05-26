@@ -108,3 +108,7 @@ storybook-static
 # Temporary folders
 tmp/
 temp/
+
+# ai and cursor
+.ai
+.cursor

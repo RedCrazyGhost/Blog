@@ -13,7 +13,7 @@ export const config = {
       import.meta.env.VITE_GITHUB_API_BASE_URL || "https://api.github.com",
   },
   app: {
-    version: import.meta.env.VITE_APP_VERSION || "v1.0.13",
+    version: import.meta.env.VITE_APP_VERSION || "v0.0.0",
     /** 关于页个人信息，数据模型见 @/types/profile */
     author: {
       name: import.meta.env.VITE_APP_AUTHOR_NAME || "RedCrazyGhost",
@@ -40,6 +40,22 @@ export const config = {
   },
   cache: {
     defaultTTL: Number(import.meta.env.VITE_CACHE_TTL) || 30, // 分钟
+  },
+  heatmap: {
+    /** 每日 Action 写入的热力图数据（同源静态 JSON） */
+    snapshotPath:
+      import.meta.env.VITE_HEATMAP_SNAPSHOT_PATH ||
+      "/data/activity-heatmap.json",
+    sources: {
+      github: {
+        enabled: import.meta.env.VITE_HEATMAP_GITHUB_ENABLED !== "false",
+        color: import.meta.env.VITE_HEATMAP_GITHUB_COLOR || "#216e39",
+      },
+      leetcode: {
+        enabled: import.meta.env.VITE_HEATMAP_LEETCODE_ENABLED !== "false",
+        color: import.meta.env.VITE_HEATMAP_LEETCODE_COLOR || "#ffa116",
+      },
+    },
   },
   font: {
     familyName: import.meta.env.VITE_FONT_FAMILY_NAME || "HYCuYuanJ",

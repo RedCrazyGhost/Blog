@@ -11,7 +11,7 @@ on:
 
 # 设置 GITHUB_TOKEN 的权限，以允许部署到 GitHub Pages。
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 
@@ -23,6 +23,10 @@ concurrency:
 jobs:
   # 单次部署的工作描述
   deploy:
+    # 跳过 Actions 机器人回推的版本 commit，避免重复部署
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      github.actor != 'github-actions[bot]'
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -37,6 +41,17 @@ jobs:
           cache: 'npm'
       - name: Install dependencies
         run: npm install
+      - name: Bump version
+        id: bump
+        run: |
+          if echo "${{ github.event.head_commit.message }}" | grep -q 'chore: bump version'; then
+            echo "version=$(node -p "JSON.parse(require('fs').readFileSync('package.json','utf8')).version")" >> "$GITHUB_OUTPUT"
+            echo "skipped=true" >> "$GITHUB_OUTPUT"
+          else
+            NEW_VERSION="$(node scripts/bump-version.mjs)"
+            echo "version=${NEW_VERSION}" >> "$GITHUB_OUTPUT"
+            echo "skipped=false" >> "$GITHUB_OUTPUT"
+          fi
       - name: Build
         run: npm run build
       - name: Setup Pages
@@ -49,3 +64,12 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+      - name: Commit version bump
+        if: steps.bump.outputs.skipped != 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add package.json package-lock.json
+          git diff --staged --quiet && exit 0
+          git commit -m "chore: bump version to ${{ steps.bump.outputs.version }}"
+          git push

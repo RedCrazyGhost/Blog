@@ -13,6 +13,7 @@ export const useGithubStore = defineStore("Github", () => {
   const currentPage = ref(1);
   const loading = ref(false);
   const error = ref<string | null>(null);
+  const hasMore = ref(true);
 
   const Github = ref<GithubConfig>({
     owner: config.github.owner,
@@ -76,6 +77,7 @@ export const useGithubStore = defineStore("Github", () => {
           });
         });
       }
+      hasMore.value = githubService.getHasMore();
       return issues;
     } catch (err) {
       const errorInfo = handleError(err);
@@ -83,6 +85,7 @@ export const useGithubStore = defineStore("Github", () => {
       logger.error("获取文章列表失败:", errorInfo);
       return [];
     } finally {
+      hasMore.value = githubService.getHasMore();
       loading.value = false;
     }
   }
@@ -94,10 +97,13 @@ export const useGithubStore = defineStore("Github", () => {
     error.value = null;
   }
 
+  const getHasMore = computed(() => hasMore.value);
+
   return {
     currentPage,
     loading,
     error,
+    hasMore: getHasMore,
     GetGithubRepo,
     GetGithubOwner,
     GetIssues,
