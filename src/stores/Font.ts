@@ -18,19 +18,20 @@ export const useFontStore = defineStore("Font", () => {
    * 生成字体 URL 字符串，支持多种格式
    */
   function getFontFaceSource(): string {
-    // 按优先级顺序：WOFF2 > WOFF > TTF
     const formatUrls: string[] = [];
 
-    Font.value.loadUrls.forEach((baseUrl) => {
-      // 尝试不同格式
-      const woff2Url = baseUrl.replace(/\.(ttf|woff|woff2)$/i, ".woff2");
-      const woffUrl = baseUrl.replace(/\.(ttf|woff|woff2)$/i, ".woff");
-      const ttfUrl = baseUrl.replace(/\.(ttf|woff|woff2)$/i, ".ttf");
-
-      // 按优先级添加（浏览器会自动选择支持的格式）
-      formatUrls.push(`url("${woff2Url}") format("woff2")`);
-      formatUrls.push(`url("${woffUrl}") format("woff")`);
-      formatUrls.push(`url("${ttfUrl}") format("truetype")`);
+    Font.value.loadUrls.forEach((url) => {
+      const match = url.match(/\.(woff2|woff|ttf)(\?.*)?$/i);
+      const ext = match?.[1]?.toLowerCase();
+      if (ext === "woff2") {
+        formatUrls.push(`url("${url}") format("woff2")`);
+      } else if (ext === "woff") {
+        formatUrls.push(`url("${url}") format("woff")`);
+      } else if (ext === "ttf") {
+        formatUrls.push(`url("${url}") format("truetype")`);
+      } else {
+        formatUrls.push(`url("${url}")`);
+      }
     });
 
     return formatUrls.join(", ");

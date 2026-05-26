@@ -1,46 +1,34 @@
-# 将静态内容部署到 GitHub Pages 的简易工作流程
+# 构建 dist 并部署到 gh-pages 分支（GitHub Pages 需选择该分支为发布源）
 name: Deploy static content to Pages
 
 on:
-  # 仅在推送到默认分支时运行。
   push:
     branches: ['main']
-
-  # 这个选项可以使你手动在 Action tab 页面触发工作流
   workflow_dispatch:
 
-# 设置 GITHUB_TOKEN 的权限，以允许部署到 GitHub Pages。
 permissions:
   contents: write
-  pages: write
-  id-token: write
 
-# 允许一个并发的部署
 concurrency:
   group: 'pages'
   cancel-in-progress: true
 
 jobs:
-  # 单次部署的工作描述
   deploy:
-    # 跳过 Actions 机器人回推的版本 commit，避免重复部署
-    if: >-
-      github.event_name == 'workflow_dispatch' ||
-      github.actor != 'github-actions[bot]'
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
           node-version: 18
           cache: 'npm'
+
       - name: Install dependencies
         run: npm install
+
       - name: Bump version
         id: bump
         run: |
@@ -52,18 +40,26 @@ jobs:
             echo "version=${NEW_VERSION}" >> "$GITHUB_OUTPUT"
             echo "skipped=false" >> "$GITHUB_OUTPUT"
           fi
+
       - name: Build
         run: npm run build
-      - name: Setup Pages
-        uses: actions/configure-pages@v4
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+
+      - name: Verify build output
+        run: |
+          if grep -q 'src/main.ts' dist/index.html; then
+            echo 'dist/index.html 仍引用源码入口，构建产物无效'
+            exit 1
+          fi
+          test -f dist/index.html
+          test -d dist/assets
+
+      - name: Deploy to gh-pages
+        uses: peaceiris/actions-gh-pages@v4
         with:
-          # Upload dist repository
-          path: './dist'
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
+          cname: blog.redcrazyghost.vip
+
       - name: Commit version bump
         if: steps.bump.outputs.skipped != 'true'
         run: |
