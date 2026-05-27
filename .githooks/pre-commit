@@ -1,0 +1,41 @@
+#!/bin/sh
+# 提交前自动 bump patch 版本，并将 package.json / package-lock.json 纳入本次 commit
+set -e
+
+if [ -n "$SKIP_VERSION_BUMP" ] || [ -n "$CI" ]; then
+  exit 0
+fi
+
+if git rev-parse -q --verify MERGE_HEAD >/dev/null 2>&1; then
+  exit 0
+fi
+if git rev-parse -q --verify CHERRY_PICK_HEAD >/dev/null 2>&1; then
+  exit 0
+fi
+if [ -d "$(git rev-parse --git-path rebase-merge)" ] || [ -d "$(git rev-parse --git-path rebase-apply)" ]; then
+  exit 0
+fi
+
+BRANCH="$(git symbolic-ref --quiet --short HEAD 2>/dev/null || true)"
+if [ "$BRANCH" != "main" ]; then
+  exit 0
+fi
+
+ROOT="$(git rev-parse --show-toplevel)"
+cd "$ROOT" || exit 1
+
+# 已有版本变更则只暂存，避免重复 bump
+if ! git diff --quiet HEAD -- package.json 2>/dev/null || ! git diff --cached --quiet HEAD -- package.json 2>/dev/null; then
+  git add package.json package-lock.json
+  exit 0
+fi
+
+# 仅当暂存区含非版本文件时才 bump
+STAGED="$(git diff --cached --name-only)"
+if [ -z "$STAGED" ]; then
+  exit 0
+fi
+echo "$STAGED" | grep -qvE '^(package\.json|package-lock\.json)$' || exit 0
+
+node scripts/bump-version.mjs >/dev/null
+git add package.json package-lock.json
