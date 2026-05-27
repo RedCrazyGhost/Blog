@@ -1,4 +1,4 @@
-# 构建 dist 并部署到 gh-pages 分支（GitHub Pages 需选择该分支为发布源）
+# 构建 dist 并通过 GitHub Actions 部署到 Pages（需在仓库 Settings → Pages 选择 GitHub Actions 为发布源）
 name: Deploy static content to Pages
 
 on:
@@ -7,7 +7,9 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
+  pages: write
+  id-token: write
 
 concurrency:
   group: 'pages'
@@ -16,6 +18,9 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -30,6 +35,8 @@ jobs:
         run: npm install
 
       - name: Build
+        env:
+          NODE_ENV: production
         run: npm run build
 
       - name: Verify build output
@@ -40,10 +47,13 @@ jobs:
           fi
           test -f dist/index.html
           test -d dist/assets
+          test -f dist/CNAME
 
-      - name: Deploy to gh-pages
-        uses: peaceiris/actions-gh-pages@v4.1.0
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist
-          cname: blog.redcrazyghost.vip
+          path: ./dist
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

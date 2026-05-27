@@ -8,12 +8,11 @@ const pkg = JSON.parse(
 ) as { version: string };
 
 // https://vitejs.dev/config/
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   define: {
     "import.meta.env.VITE_APP_VERSION": JSON.stringify(pkg.version),
   },
-  base:
-    process.env.NODE_ENV === "production" ? process.env.BASE_URL || "/" : "/",
+  base: mode === "production" ? process.env.BASE_URL || "/" : "/",
   plugins: [vue()],
   resolve: {
     alias: {
@@ -65,4 +64,4 @@ export default defineConfig({
     open: false,
     host: true,
   },
-});
+}));
