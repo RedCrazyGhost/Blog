@@ -309,12 +309,16 @@ function onCellLeave() {
   --heatmap-tooltip-bg: #21262d;
   --heatmap-tooltip-border: rgba(255, 255, 255, 0.12);
   --heatmap-tooltip-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --heatmap-tooltip-text: #e6edf3;
+  --heatmap-tooltip-text-muted: rgba(230, 237, 243, 0.75);
 }
 
 .heatmap--light {
   --heatmap-tooltip-bg: #fff;
   --heatmap-tooltip-border: rgba(0, 0, 0, 0.1);
   --heatmap-tooltip-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  --heatmap-tooltip-text: #212529;
+  --heatmap-tooltip-text-muted: rgba(33, 37, 41, 0.75);
 }
 
 .heatmap__chart {
@@ -446,6 +450,7 @@ function onCellLeave() {
   font-size: 0.75rem;
   line-height: 1.45;
   white-space: nowrap;
+  color: var(--heatmap-tooltip-text);
   background: var(--heatmap-tooltip-bg);
   border: 1px solid var(--heatmap-tooltip-border);
   box-shadow: var(--heatmap-tooltip-shadow);
@@ -484,7 +489,7 @@ function onCellLeave() {
 }
 
 .heatmap__tooltip-name {
-  opacity: 0.9;
+  color: var(--heatmap-tooltip-text-muted);
 }
 
 .heatmap__tooltip-count {
@@ -497,7 +502,7 @@ function onCellLeave() {
   padding-top: 0.35rem;
   border-top: 1px solid var(--heatmap-tooltip-border);
   font-size: 0.6875rem;
-  opacity: 0.85;
+  color: var(--heatmap-tooltip-text-muted);
 }
 
 .heatmap__legend {
