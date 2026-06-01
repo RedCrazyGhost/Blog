@@ -1,12 +1,8 @@
 # RedCrazyGhost's Blog
 
-## 开发计划（2024）
-- [ ] 添加个人介绍页面
-- [ ] 增强代码块功能（复制、行号...）
+## 项目架构
 
-## 前言
-
-本项目使用的技术是Github Package&API
+本项目使用的技术是Github Package & API
 
 技术优点：
 
@@ -15,8 +11,6 @@
 - 自动发布：每次提交git后Github会自动部署
 - 易于维护：issues管理markdown文档
 - 方便调用：Github API调用获取相关数据
-
-那我们就开始制作自己的Blog吧！
 
 ### 项目框架
 
@@ -35,10 +29,11 @@
 - mermaid - markdown 制图
 - marked - markdonw 解析器
 
-## Github Package
+### Github Package
 
 咕咕～
 
-## Github API
+### Github API
 
 咕咕～
+
