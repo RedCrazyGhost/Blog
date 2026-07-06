@@ -42,10 +42,19 @@ export const config = {
     defaultTTL: Number(import.meta.env.VITE_CACHE_TTL) || 30, // 分钟
   },
   heatmap: {
-    /** 每日 Action 写入的热力图数据（同源静态 JSON） */
+    /** 本地静态 JSON（开发/离线回退） */
     snapshotPath:
       import.meta.env.VITE_HEATMAP_SNAPSHOT_PATH ||
       "/data/activity-heatmap.json",
+    /** 远程 JSON 源（按顺序尝试；sync 推送后无需重新部署站点） */
+    remoteSnapshotUrls: [
+      import.meta.env.VITE_HEATMAP_REMOTE_URL ||
+        `https://raw.githubusercontent.com/${import.meta.env.VITE_GITHUB_OWNER || "RedCrazyGhost"}/${import.meta.env.VITE_GITHUB_REPO || "blog"}/${import.meta.env.VITE_GITHUB_BRANCH || "main"}/public/data/activity-heatmap.json`,
+      import.meta.env.VITE_HEATMAP_JSDELIVR_URL ||
+        `https://cdn.jsdelivr.net/gh/${import.meta.env.VITE_GITHUB_OWNER || "RedCrazyGhost"}/${import.meta.env.VITE_GITHUB_REPO || "blog"}@${import.meta.env.VITE_GITHUB_BRANCH || "main"}/public/data/activity-heatmap.json`,
+    ],
+    /** 设为 false 时仅读本地 snapshotPath */
+    remoteEnabled: import.meta.env.VITE_HEATMAP_REMOTE_ENABLED !== "false",
     sources: {
       github: {
         enabled: import.meta.env.VITE_HEATMAP_GITHUB_ENABLED !== "false",

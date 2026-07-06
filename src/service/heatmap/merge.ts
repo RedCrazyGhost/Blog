@@ -3,7 +3,7 @@ import type { HeatmapFetchResult } from "@/types/heatmap";
 
 export type { HeatmapFetchResult };
 
-/** 从仓库内静态 JSON 加载热力图（由每日 Action 维护） */
+/** 从 GitHub raw CDN（或本地 JSON 回退）加载热力图 */
 export async function fetchAndMergeHeatmap(): Promise<HeatmapFetchResult> {
   return loadHeatmapSnapshot();
 }
