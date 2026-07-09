@@ -65,5 +65,6 @@ export function formatHeatmapDate(dateStr: string): string {
 
 export function cellHasActivity(cell: HeatmapWeekCell): boolean {
   if (!cell.inRange) return false;
-  return Object.values(cell.counts).some((n) => n != null && n > 0);
+  if (Object.values(cell.counts).some((n) => n != null && n > 0)) return true;
+  return Object.values(cell.steamGames ?? {}).some((h) => h > 0);
 }

@@ -3,13 +3,17 @@ import type {
   HeatmapFetchResult,
   HeatmapSnapshotFile,
   HeatmapSourceId,
+  SteamSourceData,
 } from "@/types/heatmap";
 import { buildCellsFromMaps } from "@/utils/heatmap/grid";
+import { computeSteamGameMax } from "@/utils/heatmap/color";
 import { logger } from "@/utils/logger";
 
 const EMPTY_RESULT: HeatmapFetchResult = {
   cells: [],
   loadedSourceIds: [],
+  steamGameNames: {},
+  steamGameMax: {},
 };
 
 function localSnapshotUrl(): string {
@@ -24,6 +28,26 @@ function recordToMap(record: Record<string, number>): Map<string, number> {
   );
 }
 
+function isSteamSourceData(value: unknown): value is SteamSourceData {
+  return (
+    value != null &&
+    typeof value === "object" &&
+    "days" in value &&
+    typeof (value as SteamSourceData).days === "object"
+  );
+}
+
+function steamToAggregateMap(
+  steam: SteamSourceData,
+): Map<string, number> {
+  const map = new Map<string, number>();
+  for (const [date, gameHours] of Object.entries(steam.days)) {
+    const total = Object.values(gameHours).reduce((sum, h) => sum + h, 0);
+    if (total > 0) map.set(date, total);
+  }
+  return map;
+}
+
 function parseSnapshotFile(data: HeatmapSnapshotFile): HeatmapFetchResult {
   if (!data?.sources || typeof data.sources !== "object") {
     return EMPTY_RESULT;
@@ -31,12 +55,25 @@ function parseSnapshotFile(data: HeatmapSnapshotFile): HeatmapFetchResult {
 
   const maps = new Map<string, Map<string, number>>();
   const loadedSourceIds: HeatmapSourceId[] = [];
+  let steamSource: SteamSourceData | null = null;
 
   for (const [id, record] of Object.entries(data.sources)) {
-    const map = recordToMap(record ?? {});
-    if (map.size > 0) {
-      maps.set(id, map);
-      loadedSourceIds.push(id);
+    if (id === "steam" && isSteamSourceData(record)) {
+      const map = steamToAggregateMap(record);
+      if (map.size > 0) {
+        maps.set(id, map);
+        loadedSourceIds.push(id);
+        steamSource = record;
+      }
+      continue;
+    }
+
+    if (record && typeof record === "object" && !("days" in record)) {
+      const map = recordToMap(record as Record<string, number>);
+      if (map.size > 0) {
+        maps.set(id, map);
+        loadedSourceIds.push(id);
+      }
     }
   }
 
@@ -44,9 +81,21 @@ function parseSnapshotFile(data: HeatmapSnapshotFile): HeatmapFetchResult {
     return EMPTY_RESULT;
   }
 
+  const steamDays = steamSource
+    ? new Map(Object.entries(steamSource.days))
+    : undefined;
+
+  const cells = buildCellsFromMaps(maps, undefined, steamDays);
+  const steamGameNames = steamSource?.games ?? {};
+  const steamGameMax = steamSource
+    ? computeSteamGameMax(steamSource.days)
+    : {};
+
   return {
-    cells: buildCellsFromMaps(maps),
+    cells,
     loadedSourceIds,
+    steamGameNames,
+    steamGameMax,
   };
 }
 

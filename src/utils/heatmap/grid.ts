@@ -10,6 +10,7 @@ const HEATMAP_DAYS = 365;
 export function buildCellsFromMaps(
   maps: Map<string, Map<string, number>>,
   dates: string[] = buildLastNDates(HEATMAP_DAYS),
+  steamDays?: Map<string, Record<string, number>>,
 ): HeatmapCell[] {
   return dates.map((date) => {
     const counts: HeatmapCell["counts"] = {};
@@ -19,7 +20,12 @@ export function buildCellsFromMaps(
         counts[sourceId] = count;
       }
     }
-    return { date, counts };
+    const steamGames = steamDays?.get(date);
+    const cell: HeatmapCell = { date, counts };
+    if (steamGames && Object.keys(steamGames).length > 0) {
+      cell.steamGames = { ...steamGames };
+    }
+    return cell;
   });
 }
 
@@ -31,7 +37,7 @@ export function buildWeeks(
   if (dates.length === 0) return [];
 
   const dateSet = new Set(dates);
-  const countsByDate = new Map(cells.map((c) => [c.date, c.counts]));
+  const cellByDate = new Map(cells.map((c) => [c.date, c]));
   const first = parseLocalDate(dates[0]);
   const last = parseLocalDate(dates[dates.length - 1]);
 
@@ -46,10 +52,12 @@ export function buildWeeks(
     for (let day = 0; day < 7; day++) {
       const dateStr = formatLocalDate(cursor);
       const inRange = dateSet.has(dateStr);
+      const cell = cellByDate.get(dateStr);
       week.push({
         date: dateStr,
         inRange,
-        counts: inRange ? (countsByDate.get(dateStr) ?? {}) : {},
+        counts: inRange ? (cell?.counts ?? {}) : {},
+        steamGames: inRange ? cell?.steamGames : undefined,
       });
       cursor.setDate(cursor.getDate() + 1);
     }

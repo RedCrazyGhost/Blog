@@ -19,6 +19,7 @@ export const config = {
       name: import.meta.env.VITE_APP_AUTHOR_NAME || "RedCrazyGhost",
       avatar: import.meta.env.VITE_APP_AUTHOR_AVATAR || "",
       bio: import.meta.env.VITE_APP_AUTHOR_BIO || "3年 Golang 开发经验 | 上海",
+      mbti: import.meta.env.VITE_APP_AUTHOR_MBTI || "INTJ-T",
       links: [
         {
           label: "GitHub",
@@ -63,6 +64,11 @@ export const config = {
       leetcode: {
         enabled: import.meta.env.VITE_HEATMAP_LEETCODE_ENABLED !== "false",
         color: import.meta.env.VITE_HEATMAP_LEETCODE_COLOR || "#ffa116",
+      },
+      steam: {
+        enabled: import.meta.env.VITE_HEATMAP_STEAM_ENABLED !== "false",
+        color: import.meta.env.VITE_HEATMAP_STEAM_COLOR || "#66c0f4",
+        unit: "小时",
       },
     },
   },

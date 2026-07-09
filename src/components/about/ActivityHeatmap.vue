@@ -5,24 +5,49 @@
     role="group"
     aria-label="近一年活动热力图"
   >
-    <div class="heatmap__chart">
-      <div class="heatmap__inner">
-        <div class="heatmap__body">
-          <div class="heatmap__days-col" aria-hidden="true">
-            <div class="heatmap__days-gap" />
-            <div class="heatmap__days-labels">
-              <span
-                v-for="(label, di) in dayLabels"
-                :key="di"
-                class="heatmap__day"
-                :class="{ 'heatmap__day--show': showDayLabel(di) }"
-              >
-                {{ showDayLabel(di) ? label : "" }}
-              </span>
-            </div>
-          </div>
+    <header class="heatmap__header">
+      <h2 class="heatmap__title">活动记录</h2>
+    </header>
 
-          <div class="heatmap__main">
+    <div class="heatmap__card">
+      <div
+        v-if="heatmap.loading && !heatmap.loaded"
+        class="heatmap__skeleton-unified"
+        aria-hidden="true"
+        :style="skeletonGridStyle"
+      >
+        <div class="heatmap__skeleton-corner" />
+        <div class="heatmap__skeleton-months" />
+        <span
+          v-for="di in 7"
+          :key="`sk-day-${di}`"
+          class="heatmap__skeleton-day"
+          :style="{ gridRow: di + 2 }"
+        />
+        <template v-for="wi in 53" :key="`sk-week-${wi}`">
+          <span
+            v-for="di in 7"
+            :key="`sk-cell-${wi}-${di}`"
+            class="heatmap__skeleton-cell"
+            :style="{ gridColumn: wi + 2, gridRow: di + 2 }"
+          />
+        </template>
+      </div>
+
+      <div
+        v-else
+        class="heatmap__chart"
+        :class="{ 'heatmap__chart--empty': !hasActivity }"
+      >
+        <div class="heatmap__inner">
+          <div
+            class="heatmap__unified-grid"
+            role="grid"
+            aria-label="活动日历"
+            :style="unifiedGridStyle"
+          >
+            <div class="heatmap__month-corner" aria-hidden="true" />
+
             <div class="heatmap__months" aria-hidden="true">
               <span
                 v-for="m in monthLabels"
@@ -34,112 +59,139 @@
               </span>
             </div>
 
-            <div class="heatmap__grid" role="grid" aria-label="活动日历">
-              <div
-                v-for="(week, wi) in weeks"
-                :key="wi"
-                class="heatmap__week"
-                role="row"
-              >
-                <button
-                  v-for="(cell, di) in week"
-                  :key="`${wi}-${di}`"
-                  type="button"
-                  class="heatmap__cell"
-                  :class="{
-                    'heatmap__cell--pad': !cell.inRange,
-                    'heatmap__cell--active': cellHasActivity(cell),
-                  }"
-                  role="gridcell"
-                  :style="cellStyle(cell)"
-                  :aria-label="cellAria(cell)"
-                  :aria-describedby="
-                    hoveredCell === cell ? tooltipId : undefined
-                  "
-                  :disabled="!cell.inRange"
-                  :tabindex="cellHasActivity(cell) ? 0 : -1"
-                  @mouseenter="onCellEnter($event, cell)"
-                  @mouseleave="onCellLeave"
-                  @focus="onCellEnter($event, cell)"
-                  @blur="onCellLeave"
-                />
-              </div>
-            </div>
+            <span
+              v-for="(label, di) in dayLabels"
+              :key="`day-${di}`"
+              class="heatmap__day"
+              :class="{ 'heatmap__day--show': showDayLabel(di) }"
+              :style="{ gridRow: di + 2 }"
+              aria-hidden="true"
+            >
+              {{ showDayLabel(di) ? label : "" }}
+            </span>
+
+            <template v-for="(week, wi) in weeks" :key="wi">
+              <button
+                v-for="(cell, di) in week"
+                :key="`${wi}-${di}`"
+                type="button"
+                class="heatmap__cell"
+                :class="{
+                  'heatmap__cell--pad': !cell.inRange,
+                  'heatmap__cell--active': cellHasActivity(cell),
+                  'heatmap__cell--empty': cell.inRange && !cellHasActivity(cell),
+                }"
+                role="gridcell"
+                :style="cellGridStyle(wi, di, cell)"
+                :aria-label="cellAria(cell)"
+                :aria-describedby="
+                  hoveredCell === cell ? tooltipId : undefined
+                "
+                :disabled="!cell.inRange"
+                :tabindex="cellHasActivity(cell) ? 0 : -1"
+                @mouseenter="onCellEnter($event, cell)"
+                @mouseleave="onCellLeave"
+                @focus="onCellEnter($event, cell)"
+                @blur="onCellLeave"
+              />
+            </template>
           </div>
         </div>
+
+        <p v-if="heatmap.loaded && !hasActivity" class="heatmap__empty">
+          暂无活动数据
+        </p>
+
+        <Teleport to="body">
+          <Transition name="heatmap-tooltip">
+            <div
+              v-if="hoveredCell && tooltipVisible"
+              :id="tooltipId"
+              ref="tooltipRef"
+              class="heatmap__tooltip"
+              :class="isDark ? 'heatmap--dark' : 'heatmap--light'"
+              role="tooltip"
+              :style="tooltipStyle"
+            >
+              <p class="heatmap__tooltip-date">
+                {{ formatHeatmapDate(hoveredCell.date) }}
+              </p>
+              <ul class="heatmap__tooltip-sources">
+                <li
+                  v-for="item in nonSteamTooltipDetails(hoveredCell)"
+                  :key="item.id"
+                  class="heatmap__tooltip-row"
+                >
+                  <span
+                    class="heatmap__tooltip-swatch"
+                    :style="{ backgroundColor: item.color }"
+                  />
+                  <span class="heatmap__tooltip-name">{{ item.label }}</span>
+                  <span class="heatmap__tooltip-count">
+                    {{ formatCount(item.count, item.id) }}
+                    {{ getHeatmapSourceUnit(item.id) }}
+                  </span>
+                </li>
+              </ul>
+              <ul
+                v-if="steamGameTooltipDetails(hoveredCell).length"
+                class="heatmap__tooltip-games"
+              >
+                <li class="heatmap__tooltip-games-title">Steam</li>
+                <li
+                  v-for="game in steamGameTooltipDetails(hoveredCell)"
+                  :key="game.appId"
+                  class="heatmap__tooltip-row"
+                >
+                  <span
+                    class="heatmap__tooltip-swatch"
+                    :style="{ backgroundColor: game.color }"
+                  />
+                  <span class="heatmap__tooltip-name">{{ game.name }}</span>
+                  <span class="heatmap__tooltip-count">
+                    {{ formatSteamHours(game.hours) }} 小时
+                  </span>
+                </li>
+              </ul>
+              <p
+                v-if="shouldShowHeatmapTotal(nonSteamTooltipDetails(hoveredCell))"
+                class="heatmap__tooltip-total"
+              >
+                共 {{ tooltipTotal(hoveredCell) }}
+                {{ getHeatmapSourceUnit(nonSteamTooltipDetails(hoveredCell)[0]?.id) }}
+              </p>
+            </div>
+          </Transition>
+        </Teleport>
       </div>
 
-      <Teleport to="body">
-        <div
-          v-if="hoveredCell && tooltipVisible"
-          :id="tooltipId"
-          ref="tooltipRef"
-          class="heatmap__tooltip"
-          :class="isDark ? 'heatmap--dark' : 'heatmap--light'"
-          role="tooltip"
-          :style="tooltipStyle"
-        >
-          <p class="heatmap__tooltip-date">
-            {{ formatHeatmapDate(hoveredCell.date) }}
-          </p>
-          <ul class="heatmap__tooltip-sources">
-            <li
-              v-for="item in tooltipDetails(hoveredCell)"
-              :key="item.id"
-              class="heatmap__tooltip-row"
-            >
+      <footer v-if="heatmap.loaded" class="heatmap__legend">
+        <div class="heatmap__legend-sources">
+          <template v-for="src in nonSteamSourceMetas" :key="src.id">
+            <span class="heatmap__legend-pill">
               <span
-                class="heatmap__tooltip-swatch"
-                :style="{ backgroundColor: item.color }"
+                class="heatmap__legend-swatch"
+                :style="{ backgroundColor: src.color }"
               />
-              <span class="heatmap__tooltip-name">{{ item.label }}</span>
-              <span class="heatmap__tooltip-count">
-                {{ item.count }} {{ getHeatmapSourceUnit() }}
+              <span class="heatmap__legend-pill-label">{{ src.label }}</span>
+              <span class="heatmap__legend-pill-unit">
+                {{ getHeatmapSourceUnit(src.id) }}
               </span>
-            </li>
-          </ul>
-          <p
-            v-if="tooltipDetails(hoveredCell).length > 1"
-            class="heatmap__tooltip-total"
+            </span>
+          </template>
+          <span
+            v-for="game in activeSteamGames"
+            :key="game.appId"
+            class="heatmap__legend-pill"
           >
-            共 {{ tooltipTotal(hoveredCell) }} 次提交
-          </p>
+            <span
+              class="heatmap__legend-swatch"
+              :style="{ backgroundColor: game.color }"
+            />
+            <span class="heatmap__legend-pill-label">{{ game.name }}</span>
+          </span>
         </div>
-      </Teleport>
-    </div>
-
-    <div class="heatmap__legend" aria-hidden="true">
-      <span class="heatmap__legend-label">少</span>
-      <span class="heatmap__legend-empty" />
-      <span
-        v-for="lvl in 4"
-        :key="lvl"
-        class="heatmap__legend-level"
-        :style="{ opacity: 0.25 + lvl * 0.2 }"
-      />
-      <span class="heatmap__legend-label">多</span>
-
-      <span class="heatmap__legend-sep" />
-
-      <span
-        v-for="src in sourceMetas"
-        :key="src.id"
-        class="heatmap__legend-item"
-      >
-        <span
-          class="heatmap__legend-swatch"
-          :style="{ backgroundColor: src.color }"
-        />
-        {{ src.label }}
-      </span>
-
-      <span v-if="sourceMetas.length > 1" class="heatmap__legend-item">
-        <span class="heatmap__legend-mixed">
-          <span :style="{ backgroundColor: sourceMetas[0]?.color }" />
-          <span :style="{ backgroundColor: sourceMetas[1]?.color }" />
-        </span>
-        混合
-      </span>
+      </footer>
     </div>
   </div>
 </template>
@@ -148,18 +200,23 @@
 import { computed, nextTick, onMounted, ref } from "vue";
 import { useHeatmapStore } from "@/stores/Heatmap";
 import { useThemeStore } from "@/stores/Theme";
-import type { HeatmapWeekCell } from "@/types/heatmap";
+import type { HeatmapSourceId, HeatmapWeekCell } from "@/types/heatmap";
 import {
   buildDayLabels,
   buildMonthLabels,
   cellHasActivity,
   formatHeatmapDate,
 } from "@/utils/heatmap/axis";
-import { getHeatmapSourceUnit } from "@/service/heatmap/registry";
+import {
+  getHeatmapSourceUnit,
+  shouldShowHeatmapTotal,
+} from "@/service/heatmap/registry";
 import {
   getCellBackground,
   getCellSourceDetails,
   getCellTotalCount,
+  getSteamGameDetails,
+  isGradientBackground,
 } from "@/utils/heatmap/color";
 
 const heatmap = useHeatmapStore();
@@ -188,16 +245,45 @@ function monthLabelStyle(weekIndex: number): { left: string } {
   if (count <= 0) return { left: "0" };
   return { left: `${(weekIndex / count) * 100}%` };
 }
+
+const unifiedGridStyle = computed(() => ({
+  gridTemplateColumns: `var(--heatmap-axis-width) repeat(${weeks.value.length}, 1fr)`,
+}));
+
+const skeletonGridStyle = {
+  gridTemplateColumns: "var(--heatmap-axis-width) repeat(53, 1fr)",
+};
 const sourceMetas = computed(() => heatmap.activeSourceMetas);
+const nonSteamSourceMetas = computed(() =>
+  sourceMetas.value.filter((s) => s.id !== "steam"),
+);
+const activeSteamGames = computed(() => heatmap.activeSteamGames);
 const sourceMax = computed(() => heatmap.sourceMax);
 const isDark = computed(() => theme.GetThemeColor === "dark");
+const hasActivity = computed(() =>
+  heatmap.cells.some(
+    (cell) =>
+      Object.values(cell.counts).some((count) => (count ?? 0) > 0) ||
+      (cell.steamGames &&
+        Object.values(cell.steamGames).some((hours) => hours > 0)),
+  ),
+);
 
 onMounted(() => {
   void heatmap.load();
 });
 
+function formatSteamHours(hours: number): string {
+  return Number.isInteger(hours) ? String(hours) : hours.toFixed(1);
+}
+
 function showDayLabel(dayIndex: number): boolean {
   return dayIndex === 1 || dayIndex === 3 || dayIndex === 5;
+}
+
+function formatCount(count: number, id: HeatmapSourceId): string {
+  if (id === "steam") return formatSteamHours(count);
+  return String(count);
 }
 
 function cellStyle(cell: HeatmapWeekCell) {
@@ -205,18 +291,44 @@ function cellStyle(cell: HeatmapWeekCell) {
     return { backgroundColor: "transparent", visibility: "hidden" as const };
   }
   const bg = getCellBackground(
-    cell.counts,
+    { counts: cell.counts, steamGames: cell.steamGames },
     sourceMetas.value,
     sourceMax.value,
+    heatmap.steamGameMax,
+    heatmap.steamGameColors,
   );
-  if (bg.startsWith("linear-gradient")) {
+  if (isGradientBackground(bg)) {
     return { background: bg, backgroundColor: "var(--heatmap-empty)" };
   }
   return { backgroundColor: bg };
 }
 
-function tooltipDetails(cell: HeatmapWeekCell) {
-  return getCellSourceDetails(cell.counts, sourceMetas.value);
+function cellGridStyle(
+  weekIndex: number,
+  dayIndex: number,
+  cell: HeatmapWeekCell,
+) {
+  return {
+    gridColumn: weekIndex + 2,
+    gridRow: dayIndex + 2,
+    ...cellStyle(cell),
+  };
+}
+
+function nonSteamTooltipDetails(cell: HeatmapWeekCell) {
+  return getCellSourceDetails(cell.counts, sourceMetas.value).filter(
+    (d) => d.id !== "steam",
+  );
+}
+
+function steamGameTooltipDetails(cell: HeatmapWeekCell) {
+  if (!cell.steamGames) return [];
+  return getSteamGameDetails(
+    cell.steamGames,
+    heatmap.steamGameNames,
+    heatmap.steamGameMax,
+    heatmap.steamGameColors,
+  );
 }
 
 function tooltipTotal(cell: HeatmapWeekCell): number {
@@ -225,13 +337,22 @@ function tooltipTotal(cell: HeatmapWeekCell): number {
 
 function cellAria(cell: HeatmapWeekCell): string | undefined {
   if (!cell.inRange) return undefined;
-  const details = tooltipDetails(cell);
-  if (details.length === 0) return `${formatHeatmapDate(cell.date)}，无活动`;
+  const details = nonSteamTooltipDetails(cell);
+  const games = steamGameTooltipDetails(cell);
+  if (details.length === 0 && games.length === 0) {
+    return `${formatHeatmapDate(cell.date)}，无活动`;
+  }
   const parts = details.map(
-    (d) => `${d.label} ${d.count} ${getHeatmapSourceUnit()}`,
+    (d) =>
+      `${d.label} ${formatCount(d.count, d.id)} ${getHeatmapSourceUnit(d.id)}`,
   );
-  if (details.length > 1) {
-    parts.push(`共 ${tooltipTotal(cell)} 次提交`);
+  for (const game of games) {
+    parts.push(`${game.name} ${formatSteamHours(game.hours)} 小时`);
+  }
+  if (shouldShowHeatmapTotal(details)) {
+    parts.push(
+      `共 ${tooltipTotal(cell)} ${getHeatmapSourceUnit(details[0]?.id)}`,
+    );
   }
   return `${formatHeatmapDate(cell.date)}，${parts.join("，")}`;
 }
@@ -298,27 +419,103 @@ function onCellLeave() {
 <style scoped>
 .heatmap {
   --heatmap-empty: #ebedf0;
-  --heatmap-gap: 2px;
-  --heatmap-axis-width: 1.25rem;
-  --heatmap-months-height: 1.125rem;
+  --heatmap-gap: 3px;
+  --heatmap-axis-width: 1.5rem;
+  --heatmap-months-height: 1.25rem;
+  --heatmap-cell-radius: 3px;
   width: 100%;
 }
 
 .heatmap--dark {
   --heatmap-empty: #161b22;
+  --heatmap-axis: rgba(230, 237, 243, 0.55);
+  --heatmap-card-border: rgba(255, 255, 255, 0.12);
+  --heatmap-card-bg: rgba(255, 255, 255, 0.03);
+  --heatmap-hint: rgba(230, 237, 243, 0.5);
+  --heatmap-pill-bg: rgba(255, 255, 255, 0.06);
+  --heatmap-pill-border: rgba(255, 255, 255, 0.1);
+  --heatmap-skeleton: rgba(255, 255, 255, 0.08);
   --heatmap-tooltip-bg: #21262d;
   --heatmap-tooltip-border: rgba(255, 255, 255, 0.12);
-  --heatmap-tooltip-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --heatmap-tooltip-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
   --heatmap-tooltip-text: #e6edf3;
   --heatmap-tooltip-text-muted: rgba(230, 237, 243, 0.75);
+  --heatmap-hover-ring: rgba(230, 237, 243, 0.85);
 }
 
 .heatmap--light {
+  --heatmap-axis: rgba(33, 37, 41, 0.55);
+  --heatmap-card-border: rgba(0, 0, 0, 0.1);
+  --heatmap-card-bg: rgba(0, 0, 0, 0.02);
+  --heatmap-hint: rgba(33, 37, 41, 0.5);
+  --heatmap-pill-bg: rgba(0, 0, 0, 0.03);
+  --heatmap-pill-border: rgba(0, 0, 0, 0.08);
+  --heatmap-skeleton: rgba(0, 0, 0, 0.06);
   --heatmap-tooltip-bg: #fff;
   --heatmap-tooltip-border: rgba(0, 0, 0, 0.1);
-  --heatmap-tooltip-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  --heatmap-tooltip-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
   --heatmap-tooltip-text: #212529;
   --heatmap-tooltip-text-muted: rgba(33, 37, 41, 0.75);
+  --heatmap-hover-ring: rgba(33, 37, 41, 0.55);
+}
+
+.heatmap__header {
+  margin-bottom: 1rem;
+}
+
+.heatmap__title {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.heatmap__card {
+  border: 2px solid var(--heatmap-card-border);
+  border-radius: 0.75rem;
+  background: var(--heatmap-card-bg);
+  padding: 1rem 1rem 0.875rem;
+}
+
+.heatmap__skeleton-unified {
+  display: grid;
+  width: 100%;
+  gap: var(--heatmap-gap);
+  grid-template-rows: var(--heatmap-months-height) repeat(7, auto);
+  min-height: 8.5rem;
+}
+
+.heatmap__skeleton-corner {
+  grid-column: 1;
+  grid-row: 1;
+  border-radius: 4px;
+  background: var(--heatmap-skeleton);
+  animation: heatmap-pulse 1.4s ease-in-out infinite;
+}
+
+.heatmap__skeleton-months {
+  grid-column: 2 / -1;
+  grid-row: 1;
+  border-radius: 4px;
+  background: var(--heatmap-skeleton);
+  animation: heatmap-pulse 1.4s ease-in-out infinite;
+}
+
+.heatmap__skeleton-day {
+  grid-column: 1;
+  align-self: center;
+  height: 0.5rem;
+  border-radius: 2px;
+  background: var(--heatmap-skeleton);
+  animation: heatmap-pulse 1.4s ease-in-out infinite;
+}
+
+.heatmap__skeleton-cell {
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: var(--heatmap-cell-radius);
+  background: var(--heatmap-skeleton);
+  animation: heatmap-pulse 1.4s ease-in-out infinite;
 }
 
 .heatmap__chart {
@@ -328,67 +525,28 @@ function onCellLeave() {
 
 .heatmap__inner {
   width: 100%;
+  overflow: hidden;
 }
 
-.heatmap__body {
-  display: flex;
-  flex-direction: row;
-  align-items: stretch;
-  width: 100%;
-}
-
-.heatmap__days-col {
-  display: flex;
-  flex-direction: column;
-  width: var(--heatmap-axis-width);
-  flex-shrink: 0;
-  margin-right: 0;
-}
-
-.heatmap__days-gap {
-  height: var(--heatmap-months-height);
-  margin-bottom: 4px;
-  flex-shrink: 0;
-}
-
-.heatmap__days-labels {
+.heatmap__unified-grid {
   display: grid;
-  grid-template-rows: repeat(7, 1fr);
-  gap: var(--heatmap-gap);
   width: 100%;
-  flex: 1;
-  min-height: 0;
-}
-
-.heatmap__day {
-  font-size: 0.6875rem;
-  line-height: 1;
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  padding-right: 4px;
-  opacity: 0;
-  user-select: none;
-  box-sizing: border-box;
-}
-
-.heatmap__day--show {
-  opacity: 0.75;
-}
-
-.heatmap__main {
-  flex: 1;
+  gap: var(--heatmap-gap);
+  grid-template-rows: var(--heatmap-months-height) repeat(7, auto);
   min-width: 0;
-  display: flex;
-  flex-direction: column;
+}
+
+.heatmap__month-corner {
+  grid-column: 1;
+  grid-row: 1;
 }
 
 .heatmap__months {
+  grid-column: 2 / -1;
+  grid-row: 1;
   position: relative;
-  height: var(--heatmap-months-height);
-  margin-bottom: 4px;
-  width: 100%;
   overflow: visible;
+  min-width: 0;
 }
 
 .heatmap__month {
@@ -396,35 +554,47 @@ function onCellLeave() {
   top: 0;
   font-size: 0.6875rem;
   line-height: var(--heatmap-months-height);
-  opacity: 0.75;
+  color: var(--heatmap-axis);
   white-space: nowrap;
   pointer-events: none;
 }
 
-.heatmap__grid {
+.heatmap__day {
+  grid-column: 1;
+  font-size: 0.6875rem;
+  line-height: 1;
+  color: var(--heatmap-axis);
   display: flex;
-  flex-direction: row;
-  gap: var(--heatmap-gap);
-  width: 100%;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 4px;
+  opacity: 0;
+  user-select: none;
+  box-sizing: border-box;
+  align-self: center;
 }
 
-.heatmap__week {
-  display: flex;
-  flex-direction: column;
-  gap: var(--heatmap-gap);
-  flex: 1 1 0;
-  min-width: 0;
+.heatmap__day--show {
+  opacity: 1;
 }
 
 .heatmap__cell {
   width: 100%;
   aspect-ratio: 1;
-  height: auto;
-  border-radius: 2px;
+  min-width: 0;
+  border-radius: var(--heatmap-cell-radius);
   border: none;
   padding: 0;
   cursor: default;
   display: block;
+  transition:
+    transform 0.12s ease,
+    outline-color 0.12s ease,
+    box-shadow 0.12s ease;
+}
+
+.heatmap__cell--empty {
+  background-color: var(--heatmap-empty);
 }
 
 .heatmap__cell--active {
@@ -433,20 +603,31 @@ function onCellLeave() {
 
 .heatmap__cell--active:hover,
 .heatmap__cell--active:focus-visible {
-  outline: 1px solid rgba(128, 128, 128, 0.55);
+  transform: scale(1.2);
+  outline: 2px solid var(--heatmap-hover-ring);
   outline-offset: 1px;
+  box-shadow: 0 0 0 1px var(--heatmap-empty);
+  z-index: 1;
+  position: relative;
 }
 
 .heatmap__cell--pad {
   pointer-events: none;
 }
 
+.heatmap__empty {
+  margin: 0.75rem 0 0;
+  text-align: center;
+  font-size: 0.8125rem;
+  color: var(--heatmap-hint);
+}
+
 .heatmap__tooltip {
   position: fixed;
   z-index: 50;
   pointer-events: none;
-  padding: 0.5rem 0.625rem;
-  border-radius: 6px;
+  padding: 0.55rem 0.7rem;
+  border-radius: 8px;
   font-size: 0.75rem;
   line-height: 1.45;
   white-space: nowrap;
@@ -454,6 +635,16 @@ function onCellLeave() {
   background: var(--heatmap-tooltip-bg);
   border: 1px solid var(--heatmap-tooltip-border);
   box-shadow: var(--heatmap-tooltip-shadow);
+}
+
+.heatmap-tooltip-enter-active,
+.heatmap-tooltip-leave-active {
+  transition: opacity 0.12s ease;
+}
+
+.heatmap-tooltip-enter-from,
+.heatmap-tooltip-leave-to {
+  opacity: 0;
 }
 
 .heatmap__tooltip-date {
@@ -465,6 +656,20 @@ function onCellLeave() {
   list-style: none;
   margin: 0;
   padding: 0;
+}
+
+.heatmap__tooltip-games {
+  list-style: none;
+  margin: 0.35rem 0 0;
+  padding: 0.35rem 0 0;
+  border-top: 1px solid var(--heatmap-tooltip-border);
+}
+
+.heatmap__tooltip-games-title {
+  margin: 0 0 0.25rem;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--heatmap-tooltip-text-muted);
 }
 
 .heatmap__tooltip-row {
@@ -509,68 +714,63 @@ function onCellLeave() {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0.35rem 0.75rem;
-  margin-top: 0.75rem;
-  font-size: 0.75rem;
-  opacity: 0.85;
+  margin-top: 0.875rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--heatmap-card-border);
 }
 
-.heatmap__legend-label {
-  font-size: 0.6875rem;
+.heatmap__legend-sources {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
 }
 
-.heatmap__legend-empty,
-.heatmap__legend-level {
-  width: 11px;
-  height: 11px;
-  border-radius: 2px;
-  display: inline-block;
-}
-
-.heatmap__legend-empty {
-  background: var(--heatmap-empty);
-}
-
-.heatmap__legend-level {
-  background: #216e39;
-}
-
-.heatmap--dark .heatmap__legend-level {
-  background: #39d353;
-}
-
-.heatmap__legend-sep {
-  width: 1px;
-  height: 12px;
-  background: currentColor;
-  opacity: 0.2;
-  margin: 0 0.25rem;
-}
-
-.heatmap__legend-item {
+.heatmap__legend-pill {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  border: 1px solid var(--heatmap-pill-border);
+  background: var(--heatmap-pill-bg);
+  font-size: 0.75rem;
+  line-height: 1.2;
+}
+
+.heatmap__legend-pill-label {
+  font-weight: 500;
+}
+
+.heatmap__legend-pill-unit {
+  font-size: 0.6875rem;
+  color: var(--heatmap-hint);
 }
 
 .heatmap__legend-swatch {
-  width: 11px;
-  height: 11px;
+  width: 10px;
+  height: 10px;
   border-radius: 2px;
+  flex-shrink: 0;
 }
 
-.heatmap__legend-mixed {
-  display: inline-grid;
-  grid-template-columns: 1fr 1fr;
-  width: 11px;
-  height: 11px;
-  border-radius: 2px;
-  overflow: hidden;
+@keyframes heatmap-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.45;
+  }
 }
 
-.heatmap__legend-mixed span {
-  display: block;
-  width: 100%;
-  height: 100%;
+@media (max-width: 480px) {
+  .heatmap {
+    --heatmap-gap: 2px;
+    --heatmap-axis-width: 1.25rem;
+  }
+
+  .heatmap__card {
+    padding: 0.75rem 0.625rem 0.625rem;
+  }
 }
 </style>

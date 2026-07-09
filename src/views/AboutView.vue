@@ -13,7 +13,18 @@
             class="w-20 h-20 rounded-full object-cover flex-shrink-0"
           />
           <div class="flex-1 text-center sm:text-left min-w-0">
-            <p class="font-medium text-lg">{{ config.app.author.name }}</p>
+            <div
+              class="flex flex-wrap items-center gap-2 justify-center sm:justify-start"
+            >
+              <p class="font-medium text-lg">{{ config.app.author.name }}</p>
+              <span
+                v-if="config.app.author.mbti"
+                class="rounded-full border px-2 py-0.5 text-xs opacity-90"
+                :title="`MBTI: ${config.app.author.mbti}`"
+              >
+                {{ config.app.author.mbti }}
+              </span>
+            </div>
             <p
               v-if="config.app.author.bio"
               class="text-sm mt-2 opacity-90 whitespace-pre-wrap"
@@ -86,7 +97,7 @@ const skills: string[] = [
   "Git + CI/CD",
   "Docker",
   "Linux + 云平台",
-  "AI 辅助开发（Cursor/OpenSpec）",
+  "AI开发（Cursor/OpenSpec）",
 ];
 
 const workItems: TimelineItem[] = [

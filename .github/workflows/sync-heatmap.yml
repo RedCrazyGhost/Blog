@@ -1,4 +1,4 @@
-# 每日同步热力图数据到仓库（GitHub + 力扣近一年）
+# 每日同步热力图数据到仓库（GitHub + 力扣 + Steam 近一年）
 name: Sync heatmap data
 
 on:
@@ -27,9 +27,13 @@ jobs:
         env:
           VITE_GITHUB_OWNER: RedCrazyGhost
           VITE_LEETCODE_USER_SLUG: redcrazyghost
+          STEAM_API_KEY: ${{ secrets.STEAM_API_KEY }}
+          STEAM_ID: ${{ secrets.STEAM_ID }}
 
       - name: Commit and push if changed
         uses: stefanzweifel/git-auto-commit-action@v7
         with:
           commit_message: "chore(heatmap): sync activity data"
-          file_pattern: public/data/activity-heatmap.json
+          file_pattern: |
+            public/data/activity-heatmap.json
+            public/data/steam-playtime-snapshots.json

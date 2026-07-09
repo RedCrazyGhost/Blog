@@ -14,6 +14,8 @@ export interface Profile {
   avatar?: string;
   /** 个人简介 */
   bio?: string;
+  /** MBTI 人格类型，如 INTJ-T */
+  mbti?: string;
   /** 社交或个人链接列表 */
   links?: ProfileLink[];
 }
