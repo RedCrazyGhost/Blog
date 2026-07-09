@@ -34,6 +34,4 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v7
         with:
           commit_message: "chore(heatmap): sync activity data"
-          file_pattern: |
-            public/data/activity-heatmap.json
-            public/data/steam-playtime-snapshots.json
+          file_pattern: public/data/activity-heatmap.json public/data/steam-playtime-snapshots.json
