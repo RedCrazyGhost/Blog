@@ -153,13 +153,6 @@
                   </span>
                 </li>
               </ul>
-              <p
-                v-if="shouldShowHeatmapTotal(nonSteamTooltipDetails(hoveredCell))"
-                class="heatmap__tooltip-total"
-              >
-                共 {{ tooltipTotal(hoveredCell) }}
-                {{ getHeatmapSourceUnit(nonSteamTooltipDetails(hoveredCell)[0]?.id) }}
-              </p>
             </div>
           </Transition>
         </Teleport>
@@ -207,14 +200,10 @@ import {
   cellHasActivity,
   formatHeatmapDate,
 } from "@/utils/heatmap/axis";
-import {
-  getHeatmapSourceUnit,
-  shouldShowHeatmapTotal,
-} from "@/service/heatmap/registry";
+import { getHeatmapSourceUnit } from "@/service/heatmap/registry";
 import {
   getCellBackground,
   getCellSourceDetails,
-  getCellTotalCount,
   getSteamGameDetails,
   isGradientBackground,
 } from "@/utils/heatmap/color";
@@ -331,10 +320,6 @@ function steamGameTooltipDetails(cell: HeatmapWeekCell) {
   );
 }
 
-function tooltipTotal(cell: HeatmapWeekCell): number {
-  return getCellTotalCount(cell.counts);
-}
-
 function cellAria(cell: HeatmapWeekCell): string | undefined {
   if (!cell.inRange) return undefined;
   const details = nonSteamTooltipDetails(cell);
@@ -348,11 +333,6 @@ function cellAria(cell: HeatmapWeekCell): string | undefined {
   );
   for (const game of games) {
     parts.push(`${game.name} ${formatSteamHours(game.hours)} 小时`);
-  }
-  if (shouldShowHeatmapTotal(details)) {
-    parts.push(
-      `共 ${tooltipTotal(cell)} ${getHeatmapSourceUnit(details[0]?.id)}`,
-    );
   }
   return `${formatHeatmapDate(cell.date)}，${parts.join("，")}`;
 }
@@ -700,14 +680,6 @@ function onCellLeave() {
 .heatmap__tooltip-count {
   font-variant-numeric: tabular-nums;
   font-weight: 500;
-}
-
-.heatmap__tooltip-total {
-  margin: 0.35rem 0 0;
-  padding-top: 0.35rem;
-  border-top: 1px solid var(--heatmap-tooltip-border);
-  font-size: 0.6875rem;
-  color: var(--heatmap-tooltip-text-muted);
 }
 
 .heatmap__legend {

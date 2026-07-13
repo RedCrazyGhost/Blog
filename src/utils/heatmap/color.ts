@@ -195,13 +195,3 @@ export function getSteamGameDetails(
     });
 }
 
-export function getCellTotalCount(
-  counts: Partial<Record<HeatmapSourceId, number>>,
-): number {
-  let total = 0;
-  for (const n of Object.values(counts)) {
-    total += n ?? 0;
-  }
-  return total;
-}
-

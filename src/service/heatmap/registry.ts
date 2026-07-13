@@ -34,11 +34,3 @@ export function getHeatmapSourceMetas(): HeatmapSourceMeta[] {
       unit: s.unit,
     }));
 }
-
-export function shouldShowHeatmapTotal(
-  details: Array<{ id: HeatmapSourceId }>,
-): boolean {
-  if (details.length <= 1) return false;
-  const units = new Set(details.map((d) => getHeatmapSourceUnit(d.id)));
-  return units.size === 1;
-}
