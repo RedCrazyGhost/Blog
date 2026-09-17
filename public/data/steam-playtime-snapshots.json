@@ -107,6 +107,7 @@
     "1611740": "BattleBit Remastered Playtest",
     "1619520": "Cross Blitz",
     "1772530": "Toy Tactics",
+    "1867240": "WARDOGS",
     "1999170": "Insect Swarm",
     "2149010": "Little Nightmares Enhanced Edition",
     "2245830": "Company of Heroes 3 - Multiplayer Tech Test",
@@ -118,7 +119,7 @@
     "3081410": "Battlefield™ 6 Open Beta",
     "3240220": "Grand Theft Auto V Enhanced"
   },
-  "snapshotDate": "2026-09-16",
+  "snapshotDate": "2026-09-17",
   "playtime": {
     "10": 0,
     "20": 0,
@@ -227,6 +228,7 @@
     "1611740": 2,
     "1619520": 202,
     "1772530": 136,
+    "1867240": 92,
     "1999170": 371,
     "2149010": 0,
     "2245830": 214,
