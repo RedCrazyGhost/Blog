@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-28T21:25:41.884Z",
+  "generatedAt": "2026-09-29T20:16:43.090Z",
   "sources": {
     "github": {
       "2026-01-10": 11,
@@ -141,7 +141,8 @@
       "2026-09-24": 1,
       "2026-09-25": 1,
       "2026-09-26": 1,
-      "2026-09-27": 1
+      "2026-09-27": 1,
+      "2026-09-28": 1
     },
     "leetcode": {
       "2026-04-13": 8,
@@ -273,7 +274,7 @@
         "271590": "Grand Theft Auto V Legacy",
         "273350": "Evolve Stage 2",
         "289650": "Assassin's Creed Unity",
-        "292030": "The Witcher 3: Wild Hunt - Complete Edition",
+        "292030": "The Witcher 3: Wild Hunt — Remastered",
         "304930": "Unturned",
         "323190": "Frostpunk",
         "335300": "DARK SOULS™ II: Scholar of the First Sin",
